@@ -1,0 +1,9 @@
+#start-btn {
+  display: inline-block;
+}
+
+#count {
+  font-weight: bold;
+  display: inline-block;
+  margin-left: 10px;
+}
