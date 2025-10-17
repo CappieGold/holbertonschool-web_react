@@ -1,12 +1,12 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'production',
   entry: './js/dashboard_main.js',
   output: {
-    filename: 'bundle.js',
     path: path.resolve(__dirname, 'public'),
+    filename: 'bundle.js',
   },
+  mode: 'production',
   module: {
     rules: [
       {
@@ -14,36 +14,22 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.(png|jpe?g|gif|svg)$/i,
+        test: /\.(png|jpe?g|gif)$/i,
+        type: 'asset/resource',
+        generator: {
+          filename: 'images/[name][ext]',
+        },
         use: [
-          'file-loader',
           {
             loader: 'image-webpack-loader',
             options: {
-              mozjpeg: {
-                progressive: true,
-                quality: 65,
-              },
-              optipng: {
-                enabled: false,
-              },
-              pngquant: {
-                quality: [0.65, 0.90],
-                speed: 4,
-              },
-              gifsicle: {
-                interlaced: false,
-              },
-              webp: {
-                quality: 75,
-              },
+              mozjpeg: { progressive: true },
+              optipng: { enabled: true },
+              pngquant: { quality: [0.65, 0.90], speed: 4 },
             },
           },
         ],
       },
     ],
-  },
-  performance: {
-    hints: false,
   },
 };
