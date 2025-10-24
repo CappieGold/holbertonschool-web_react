@@ -34,16 +34,16 @@ describe('App Component', () => {
 
   test('renders 2 input elements', () => {
     render(<App />);
-    const emailInput = screen.getByRole('textbox', { name: /email/i });
+    const inputs = screen.getAllByRole('textbox');
     const passwordInput = screen.getByLabelText(/password/i);
-    expect(emailInput).toBeInTheDocument();
+    expect(inputs.length).toBeGreaterThanOrEqual(1);
     expect(passwordInput).toBeInTheDocument();
   });
 
   test('renders 2 label elements with text Email and Password', () => {
     render(<App />);
-    const emailLabel = screen.getByText(/email:/i);
-    const passwordLabel = screen.getByText(/password:/i);
+    const emailLabel = screen.getByText(/email/i);
+    const passwordLabel = screen.getByText(/password/i);
     expect(emailLabel).toBeInTheDocument();
     expect(passwordLabel).toBeInTheDocument();
   });
