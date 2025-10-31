@@ -2,34 +2,38 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import Notifications from './Notifications';
 
 describe('Notifications Component', () => {
-  it('checks the existence of the notifications title "Here is the list of notifications"', () => {
+  test('renders the notifications title', () => {
     render(<Notifications />);
-    const title = screen.getByText(/here is the list of notifications/i);
-    expect(title).toBeInTheDocument();
+    const titleElement = screen.getByText(/here is the list of notifications/i);
+    expect(titleElement).toBeInTheDocument();
   });
 
-  it('checks the existence of the button element in the notifications', () => {
+  test('renders the close button', () => {
     render(<Notifications />);
-    const button = screen.getByRole('button', { name: /close/i });
-    expect(button).toBeInTheDocument();
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    expect(closeButton).toBeInTheDocument();
   });
 
-  it('verifies that there are 3 li elements as notifications rendered', () => {
+  test('renders 3 list items', () => {
     const { container } = render(<Notifications />);
-    const liElements = container.querySelectorAll('li');
-    expect(liElements.length).toBe(3);
+    const listItems = container.querySelectorAll('li');
+    expect(listItems).toHaveLength(3);
   });
 
-  it('checks whether clicking the close button logs "Close button has been clicked" to the console', () => {
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  test('clicking close button logs message to console', () => {
+    // Mock console.log
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
     
     render(<Notifications />);
     const closeButton = screen.getByRole('button', { name: /close/i });
     
+    // Simulate click event
     fireEvent.click(closeButton);
     
-    expect(logSpy).toHaveBeenCalledWith('Close button has been clicked');
+    // Check if console.log was called with the correct message
+    expect(consoleSpy).toHaveBeenCalledWith('Close button has been clicked');
     
-    logSpy.mockRestore();
+    // Restore console.log
+    consoleSpy.mockRestore();
   });
 });
