@@ -2,34 +2,34 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import Notifications from './Notifications';
 
 describe('Notifications Component', () => {
-  test('renders the notifications title "Here is the list of notifications"', () => {
+  it('checks the existence of the notifications title "Here is the list of notifications"', () => {
     render(<Notifications />);
-    const titleElement = screen.getByText(/here is the list of notifications/i);
-    expect(titleElement).toBeInTheDocument();
+    const title = screen.getByText(/here is the list of notifications/i);
+    expect(title).toBeInTheDocument();
   });
 
-  test('renders the close button element', () => {
+  it('checks the existence of the button element in the notifications', () => {
     render(<Notifications />);
-    const closeButton = screen.getByRole('button', { name: /close/i });
-    expect(closeButton).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: /close/i });
+    expect(button).toBeInTheDocument();
   });
 
-  test('renders 3 li elements', () => {
+  it('verifies that there are 3 li elements as notifications rendered', () => {
     const { container } = render(<Notifications />);
-    const listItems = container.querySelectorAll('li');
-    expect(listItems).toHaveLength(3);
+    const liElements = container.querySelectorAll('li');
+    expect(liElements.length).toBe(3);
   });
 
-  test('logs "Close button has been clicked" when close button is clicked', () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+  it('checks whether clicking the close button logs "Close button has been clicked" to the console', () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     
     render(<Notifications />);
     const closeButton = screen.getByRole('button', { name: /close/i });
     
     fireEvent.click(closeButton);
     
-    expect(consoleSpy).toHaveBeenCalledWith('Close button has been clicked');
+    expect(logSpy).toHaveBeenCalledWith('Close button has been clicked');
     
-    consoleSpy.mockRestore();
+    logSpy.mockRestore();
   });
 });
