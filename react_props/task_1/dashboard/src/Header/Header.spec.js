@@ -20,6 +20,6 @@ describe('Header Component', () => {
       name: /school dashboard/i 
     });
     expect(heading).toBeInTheDocument();
-    expect(heading).toHaveTextContent('School dashboard');
+    expect(heading).toHaveTextContent('School Dashboard');
   });
 });
