@@ -18,8 +18,17 @@ describe('Footer Component', () => {
     );
     
     expect(copyrightElement).toBeInTheDocument();
-    
     expect(footerText).toBe('Holberton School');
+  });
+
+  test('getFooterCopy returns correct text when isIndex is true', () => {
+    const result = getFooterCopy(true);
+    expect(result).toBe('Holberton School');
+  });
+
+  test('getFooterCopy returns correct text when isIndex is false', () => {
+    const result = getFooterCopy(false);
+    expect(result).toBe('Holberton School main dashboard');
   });
 
   test('displays the correct copyright text format', () => {
@@ -31,7 +40,6 @@ describe('Footer Component', () => {
     expect(paragraph).toBeInTheDocument();
     
     expect(paragraph.textContent).toContain(currentYear.toString());
-    
     expect(paragraph.textContent).toMatch(/holberton school/i);
   });
 });
