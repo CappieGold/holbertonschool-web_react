@@ -14,7 +14,7 @@ describe('Footer Component', () => {
     const footerText = getFooterCopy(true);
     
     const copyrightElement = screen.getByText(
-      new RegExp(`copyright ${currentYear} ${footerText}`, 'i')
+      new RegExp(`copyright ${currentYear} - ${footerText}`, 'i')
     );
     
     expect(copyrightElement).toBeInTheDocument();
