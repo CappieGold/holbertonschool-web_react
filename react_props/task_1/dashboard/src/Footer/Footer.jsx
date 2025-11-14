@@ -4,7 +4,7 @@ import { getCurrentYear, getFooterCopy } from '../utils/utils';
 function Footer() {
   return (
     <div className="App-footer">
-      <p>Copyright {getCurrentYear()} {getFooterCopy(true)} main dashboard</p>
+      <p>Copyright {getCurrentYear()} {getFooterCopy(true)}</p>
     </div>
   );
 }
