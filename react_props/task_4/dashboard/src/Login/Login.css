@@ -1,0 +1,37 @@
+spaces/Full-Stack/holbertonschool-web_react/react_props/task_0/dashboard/src/Login/Login.css */
+.App-body {
+  padding: 36px 24px;
+  min-height: 50vh;
+}
+
+.App-body p {
+  margin-bottom: 20px;
+}
+
+.App-body form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.App-body label {
+  font-weight: bold;
+}
+
+.App-body input {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.App-body button {
+  padding: 5px 10px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.App-body button:hover {
+  background-color: #f0f0f0;
+}
