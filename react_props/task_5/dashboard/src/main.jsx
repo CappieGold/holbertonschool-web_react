@@ -4,6 +4,6 @@ import App from './App/App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App isLoggedIn={true} />
+    <App isLoggedIn={true} displayDrawer={true} />
   </StrictMode>,
 )
