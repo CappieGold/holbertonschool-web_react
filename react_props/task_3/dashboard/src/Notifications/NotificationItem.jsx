@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-function NotificationItem({ type = 'default', html = null, value = '' }) {
+function NotificationItem({ type, html, value }) {
   const styles = {
     color: type === 'urgent' ? 'red' : 'blue'
   };
@@ -33,10 +33,4 @@ NotificationItem.propTypes = {
   value: PropTypes.string
 };
 
-NotificationItem.defaultProps = {
-  type: 'default',
-  html: null,
-  value: ''
-};
-
-export default NotificationItem;
+export default NotificationItem;$
