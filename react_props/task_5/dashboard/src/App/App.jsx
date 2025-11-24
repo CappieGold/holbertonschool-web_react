@@ -39,7 +39,8 @@ function App({ isLoggedIn = false, displayDrawer = false }) {
 }
 
 App.propTypes = {
-  isLoggedIn: PropTypes.bool
+  isLoggedIn: PropTypes.bool,
+  displayDrawer: PropTypes.bool
 };
 
 export default App;

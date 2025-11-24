@@ -1,46 +1,24 @@
 import { render, screen } from '@testing-library/react';
-import CourseListRow from './CourseListRow';
+import CourseList from './CourseList';
 
-describe('CourseListRow Component', () => {
-  test('renders one cell with colspan=2 when isHeader is true and textSecondCell is null', () => {
-    render(
-      <table>
-        <tbody>
-          <CourseListRow isHeader={true} textFirstCell="Header" />
-        </tbody>
-      </table>
-    );
-    const thElement = screen.getByRole('columnheader');
-    expect(thElement).toBeInTheDocument();
-    expect(thElement).toHaveAttribute('colspan', '2');
-    expect(thElement).toHaveTextContent('Header');
+describe('CourseList Component', () => {
+  test('renders correctly with empty courses array', () => {
+    render(<CourseList courses={[]} />);
+    
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(1);
   });
 
-  test('renders two cells when isHeader is true and textSecondCell is present', () => {
-    render(
-      <table>
-        <thead>
-          <CourseListRow isHeader={true} textFirstCell="Header 1" textSecondCell="Header 2" />
-        </thead>
-      </table>
-    );
-    const thElements = screen.getAllByRole('columnheader');
-    expect(thElements).toHaveLength(2);
-    expect(thElements[0]).toHaveTextContent('Header 1');
-    expect(thElements[1]).toHaveTextContent('Header 2');
-  });
+  test('renders correctly with list of courses', () => {
+    const courses = [
+      { id: 1, name: 'ES6', credit: 60 },
+      { id: 2, name: 'Webpack', credit: 20 },
+      { id: 3, name: 'React', credit: 40 }
+    ];
+    
+    render(<CourseList courses={courses} />);
 
-  test('renders two td elements within a tr element when isHeader is false', () => {
-    render(
-      <table>
-        <tbody>
-          <CourseListRow isHeader={false} textFirstCell="Cell 1" textSecondCell="Cell 2" />
-        </tbody>
-      </table>
-    );
-    const tdElements = screen.getAllByRole('cell');
-    expect(tdElements).toHaveLength(2);
-    expect(tdElements[0]).toHaveTextContent('Cell 1');
-    expect(tdElements[1]).toHaveTextContent('Cell 2');
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(5);
   });
 });

@@ -10,7 +10,7 @@ function Notifications({ displayDrawer = false, notifications = [] }) {
 
   return (
     <div className="NotificationsComponent">
-      <div className="menuItem">
+      <div className="notification-title">
         Your notifications
       </div>
       {displayDrawer && (
