@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-function NotificationItem({ type, html, value }) {
+function NotificationItem({ type = 'default', html = null, value = '' }) {
   const styles = {
     color: type === 'urgent' ? 'red' : 'blue'
   };
