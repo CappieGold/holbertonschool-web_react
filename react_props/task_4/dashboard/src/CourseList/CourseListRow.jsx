@@ -19,8 +19,8 @@ function CourseListRow({ isHeader = false, textFirstCell, textSecondCell = null 
 
   return (
     <tr>
-      <td colSpan={textSecondCell === null ? 2 : 1}>{textFirstCell}</td>
-      {textSecondCell !== null && <td>{textSecondCell}</td>}
+      <td>{textFirstCell}</td>
+      <td>{textSecondCell}</td>
     </tr>
   );
 }
