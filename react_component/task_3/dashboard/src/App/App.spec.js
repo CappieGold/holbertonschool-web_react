@@ -32,7 +32,7 @@ describe('App Component', () => {
 
   test('does not render CourseList when isLoggedIn is false', () => {
     render(<App isLoggedIn={false} />);
-    expect(screen.getByText(/login to access the full dashboard/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /log in to continue/i })).toBeInTheDocument();
 
     const table = screen.queryByRole('table');
     expect(table).not.toBeInTheDocument();
@@ -40,7 +40,7 @@ describe('App Component', () => {
 
   test('renders CourseList when isLoggedIn is true', () => {
     render(<App isLoggedIn={true} />);
-    expect(screen.queryByText(/login to access the full dashboard/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /course list/i })).toBeInTheDocument();
 
     const table = screen.getByRole('table');
     expect(table).toBeInTheDocument();
@@ -58,5 +58,18 @@ describe('App Component', () => {
     expect(logOutMock).toHaveBeenCalled();
 
     alertMock.mockRestore();
+  });
+
+  test('displays News from the School section with correct title and paragraph', () => {
+    render(<App />);
+
+    const newsTitle = screen.getByRole('heading', { 
+      level: 2, 
+      name: /news from the school/i 
+    });
+    expect(newsTitle).toBeInTheDocument();
+
+    const newsParagraph = screen.getByText(/holberton school news goes here/i);
+    expect(newsParagraph).toBeInTheDocument();
   });
 });
