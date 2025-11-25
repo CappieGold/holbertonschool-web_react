@@ -56,4 +56,57 @@ describe('Notifications Component', () => {
 
     consoleSpy.mockRestore();
   });
+
+  test('does not re-render when notifications length stays the same', () => {
+    const initialNotifications = [
+      { id: 1, type: 'default', value: 'First notification' },
+      { id: 2, type: 'urgent', value: 'Second notification' },
+      { id: 3, type: 'default', value: 'Third notification' }
+    ];
+
+    const updatedNotifications = [
+      { id: 1, type: 'default', value: 'Updated first notification' },
+      { id: 2, type: 'urgent', value: 'Updated second notification' },
+      { id: 3, type: 'default', value: 'Updated third notification' }
+    ];
+
+    const { rerender } = render(
+      <Notifications displayDrawer={true} notifications={initialNotifications} />
+    );
+
+    expect(screen.getByText('First notification')).toBeInTheDocument();
+
+    rerender(
+      <Notifications displayDrawer={true} notifications={updatedNotifications} />
+    );
+
+    expect(screen.getByText('First notification')).toBeInTheDocument();
+    expect(screen.queryByText('Updated first notification')).not.toBeInTheDocument();
+  });
+
+  test('re-renders when notifications length changes', () => {
+    const initialNotifications = [
+      { id: 1, type: 'default', value: 'First notification' },
+      { id: 2, type: 'urgent', value: 'Second notification' }
+    ];
+
+    const longerNotifications = [
+      { id: 1, type: 'default', value: 'First notification' },
+      { id: 2, type: 'urgent', value: 'Second notification' },
+      { id: 3, type: 'default', value: 'Third notification' }
+    ];
+
+    const { rerender } = render(
+      <Notifications displayDrawer={true} notifications={initialNotifications} />
+    );
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+
+    rerender(
+      <Notifications displayDrawer={true} notifications={longerNotifications} />
+    );
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+    expect(screen.getByText('Third notification')).toBeInTheDocument();
+  });
 });
