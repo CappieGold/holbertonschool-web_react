@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 
 function CourseListRow({ isHeader = false, textFirstCell, textSecondCell = null }) {
   const rowStyle = isHeader
-    ? 'bg-[var(--color-table-header)] opacity/66'
-    : 'bg-[var(--color-table-rows)] opacity/45';
+    ? 'bg-[var(--color-table-header)]/[0.66]'
+    : 'bg-[var(--color-table-rows)]/[0.45]';
 
   const cellBorder = 'border border-gray-400';
 
