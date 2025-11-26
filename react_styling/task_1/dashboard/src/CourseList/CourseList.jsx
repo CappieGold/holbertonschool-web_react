@@ -8,7 +8,7 @@ class CourseList extends React.Component {
     const { courses } = this.props;
 
     return (
-      <div className="w-4/5 mx-auto">
+      <div className="w-[80%] mx-auto">
         <table id="CourseList" className="w-full">
           {courses.length > 0 && (
             <thead>
