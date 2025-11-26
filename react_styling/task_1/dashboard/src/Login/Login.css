@@ -1,0 +1,31 @@
+.login-body p {
+  margin-bottom: 20px;
+}
+
+.login-body form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.login-body label {
+  font-weight: bold;
+}
+
+.login-body input {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.login-body button {
+  padding: 5px 10px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.login-body button:hover {
+  background-color: #f0f0f0;
+}
