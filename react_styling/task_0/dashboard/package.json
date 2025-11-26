@@ -14,11 +14,11 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@fontsource/roboto": "5.2.9",
-    "@tailwindcss/vite": "4.1.17",
+    "@fontsource/roboto": "^5.2.9",
+    "@tailwindcss/vite": "^4.1.17",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "tailwindcss": "4.1.17"
+    "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
