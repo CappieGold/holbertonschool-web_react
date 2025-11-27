@@ -5,32 +5,36 @@ class NotificationItem extends React.PureComponent {
   render() {
     const { type, html, value, markAsRead, id } = this.props;
 
-    const colorClass = type === 'urgent'
-      ? 'text-[var(--color-urgent-notification-item)] before:bg-[var(--color-urgent-notification-item)]'
-      : 'text-[var(--color-default-notification-item)] before:bg-[var(--color-default-notification-item)]';
-
-    const liClasses = `${colorClass} list-none flex items-baseline gap-2 before:content-[''] before:inline-block before:w-2 before:h-2 before:shrink-0`;
-
-    if (html) {
+    if (type === 'default') {
       return (
         <li
+          className="text-[color:var(--default-notification-item)] pl-1"
           data-notification-type={type}
-          className={liClasses}
+          onClick={() => markAsRead(id)}
+        >
+          {value}
+        </li>
+      );
+    } else if (type === 'urgent' && html !== undefined) {
+      return (
+        <li
+          className="text-[color:var(--urgent-notification-item)] pl-1"
+          data-notification-type={type}
           dangerouslySetInnerHTML={html}
           onClick={() => markAsRead(id)}
         />
       );
+    } else {
+      return (
+        <li
+          className="text-[color:var(--urgent-notification-item)] pl-1"
+          data-notification-type={type}
+          onClick={() => markAsRead(id)}
+        >
+          {value}
+        </li>
+      );
     }
-
-    return (
-      <li
-        data-notification-type={type}
-        className={liClasses}
-        onClick={() => markAsRead(id)}
-      >
-        {value}
-      </li>
-    );
   }
 }
 
@@ -46,9 +50,9 @@ NotificationItem.propTypes = {
 
 NotificationItem.defaultProps = {
   type: 'default',
-  html: null,
+  html: undefined,
   value: '',
-  markAsRead: () => { },
+  markAsRead: () => {},
   id: 0
 };
 

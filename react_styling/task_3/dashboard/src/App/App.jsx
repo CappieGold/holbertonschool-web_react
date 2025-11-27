@@ -7,6 +7,19 @@ import Footer from '../Footer/Footer';
 import CourseList from '../CourseList/CourseList';
 import BodySection from '../BodySection/BodySection';
 import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBottom';
+import { getLatestNotification } from '../utils/utils';
+
+const notificationsList = [
+  { id: 1, type: 'default', value: 'New course available' },
+  { id: 2, type: 'urgent', value: 'New resume available' },
+  { id: 3, type: 'urgent', html: { __html: getLatestNotification() } }
+];
+
+const coursesList = [
+  { id: 1, name: 'ES6', credit: 60 },
+  { id: 2, name: 'Webpack', credit: 20 },
+  { id: 3, name: 'React', credit: 40 }
+];
 
 class App extends React.Component {
   constructor(props) {
@@ -32,42 +45,28 @@ class App extends React.Component {
   render() {
     const { isLoggedIn, displayDrawer } = this.props;
 
-    const notificationsList = [
-      { id: 1, type: 'default', value: 'New course available' },
-      { id: 2, type: 'urgent', value: 'New resume available' },
-      { id: 3, type: 'urgent', html: { __html: '<strong>Urgent requirement</strong> - complete by EOD' } }
-    ];
-
-    const listCourses = [
-      { id: 1, name: 'ES6', credit: 60 },
-      { id: 2, name: 'Webpack', credit: 20 },
-      { id: 3, name: 'React', credit: 40 }
-    ];
-
     return (
-      <React.Fragment>
-        <div className="root-notifications absolute top-0 right-0">
+      <div className="relative px-3 min-h-screen flex flex-col">
+        <div className="absolute top-0 right-0 z-10">
           <Notifications notifications={notificationsList} displayDrawer={displayDrawer} />
         </div>
-        <Header />
-        <div className="App-body p-9 min-h-[50vh]">
-          {isLoggedIn ? (
-            <BodySection title="Course list">
-              <CourseList courses={listCourses} />
-            </BodySection>
-          ) : (
+        <div className="flex-1">
+          <Header />
+          {!isLoggedIn ? (
             <BodySectionWithMarginBottom title="Log in to continue">
               <Login />
             </BodySectionWithMarginBottom>
+          ) : (
+            <BodySectionWithMarginBottom title="Course list">
+              <CourseList courses={coursesList} />
+            </BodySectionWithMarginBottom>
           )}
-          <div className="mt-40">
-            <BodySection title="News from the School">
-              <p>Holberton School news goes here</p>
-            </BodySection>
-          </div>
+          <BodySection title="News from the School">
+            <p>Holberton School news goes here</p>
+          </BodySection>
         </div>
         <Footer />
-      </React.Fragment>
+      </div>
     );
   }
 }
@@ -80,7 +79,7 @@ App.propTypes = {
 
 App.defaultProps = {
   isLoggedIn: false,
-  displayDrawer: false,
+  displayDrawer: true,
   logOut: () => {}
 };
 

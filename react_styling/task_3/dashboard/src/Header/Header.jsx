@@ -2,13 +2,11 @@ import logo from '../assets/holberton-logo.jpg';
 
 function Header() {
   return (
-    <div className="App-header flex flex-row items-center text-[var(--color-main)]">
-      <img 
-        src={logo} 
-        alt="holberton logo" 
-        className="h-[200px] w-[200px]"
-      />
-      <h1 className="text-[2rem]">School Dashboard</h1>
+    <div className="App-header flex items-center py-2">
+      <img src={logo} className="App-logo h-60 pointer-events-none" alt="holberton logo" />
+      <h1 className="font-bold text-[color:var(--main-color)] text-5xl">
+        School Dashboard
+      </h1>
     </div>
   );
 }

@@ -1,32 +1,22 @@
 import PropTypes from 'prop-types';
 
-function CourseListRow({ isHeader = false, textFirstCell, textSecondCell = null }) {
-  const rowStyle = isHeader
-    ? 'bg-[var(--color-table-header)]/[0.66]'
-    : 'bg-[var(--color-table-rows)]/[0.45]';
-
-  const cellBorder = 'border border-gray-400';
-
-  if (isHeader) {
-    if (textSecondCell === null) {
-      return (
-        <tr className={rowStyle}>
-          <th colSpan="2" className={cellBorder}>{textFirstCell}</th>
-        </tr>
-      );
-    }
-    return (
-      <tr className={rowStyle}>
-        <th className={cellBorder}>{textFirstCell}</th>
-        <th className={cellBorder}>{textSecondCell}</th>
-      </tr>
-    );
-  }
-
+function CourseListRow({ isHeader = false, textFirstCell = '', textSecondCell = null }) {
   return (
-    <tr className={rowStyle}>
-      <td className={`${cellBorder} pl-2`}>{textFirstCell}</td>
-      <td className={`${cellBorder} pl-2`}>{textSecondCell}</td>
+    <tr className={isHeader
+      ? "bg-[color-mix(in_srgb,var(--color-table-header)_66%,transparent)]"
+      : "bg-[color-mix(in_srgb,var(--color-table-rows)_45%,transparent)]"
+    }>
+      {isHeader ? (
+        <>
+          <th className="border border-gray-400" colSpan={textSecondCell ? 1 : 2}>{textFirstCell}</th>
+          {textSecondCell && <th className="border border-gray-400">{textSecondCell}</th>}
+        </>
+      ) : (
+        <>
+          <td className="border border-gray-400 pl-2">{textFirstCell}</td>
+          <td className="border border-gray-400 pl-2">{textSecondCell}</td>
+        </>
+      )}
     </tr>
   );
 }

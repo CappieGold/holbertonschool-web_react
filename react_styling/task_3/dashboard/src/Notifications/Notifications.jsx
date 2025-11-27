@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import closeIcon from '../assets/close-button.png';
 import NotificationItem from './NotificationItem';
 
 class Notifications extends React.Component {
@@ -9,40 +10,39 @@ class Notifications extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    return nextProps.notifications.length !== this.props.notifications.length;
+    return (
+      this.props.notifications.length !== nextProps.notifications.length ||
+      this.props.displayDrawer !== nextProps.displayDrawer
+    );
   }
 
   markAsRead(id) {
-    console.log(`Notification ${id} has been marked as read`);
+    console.log(`Notification ${id + 1} has been marked as read`);
   }
 
   render() {
     const { displayDrawer, notifications } = this.props;
 
     return (
-      <div className="absolute right-0 top-0">
-        <p className="text-right mb-1 cursor-pointer">
-          Your notifications
-        </p>
-        
-        {displayDrawer && (
-          <div className="relative border-2 border-dashed border-[var(--color-main)] bg-white w-[25vw] p-1.5">
-            {notifications.length === 0 ? (
-              <p>No new notification for now</p>
-            ) : (
-              <>
-                <button 
-                  className="absolute top-1 right-1 cursor-pointer bg-transparent border-none text-lg"
+      <div className="w-full">
+        <div className="notification-title text-right pr-3 pt-1">Your notifications</div>
+        {displayDrawer ? (
+          <div className="notification-items relative border-[3px] border-dotted border-[color:var(--main-color)] w-100 p-2 right-3 float-right mt-1">
+            {notifications.length > 0 ? (
+              <div className="relative">
+                <p className="m-0">Here is the list of notifications</p>
+                <button
+                  onClick={() => console.log('Close button has been clicked')}
                   aria-label="Close"
+                  className="absolute cursor-pointer right-0 top-0 bg-transparent"
                 >
-                  ×
+                  <img src={closeIcon} alt="close icon" className="w-3 h-3" />
                 </button>
-                <p>Here is the list of notifications</p>
-                <ul className="m-0 p-0">
-                  {notifications.map((notification) => (
+                <ul className="list-[square] pl-5">
+                  {notifications.map((notification, index) => (
                     <NotificationItem
+                      id={index}
                       key={notification.id}
-                      id={notification.id}
                       type={notification.type}
                       value={notification.value}
                       html={notification.html}
@@ -50,10 +50,12 @@ class Notifications extends React.Component {
                     />
                   ))}
                 </ul>
-              </>
+              </div>
+            ) : (
+              <p>No new notification for now</p>
             )}
           </div>
-        )}
+        ) : null}
       </div>
     );
   }
@@ -74,7 +76,7 @@ Notifications.propTypes = {
 };
 
 Notifications.defaultProps = {
-  displayDrawer: false,
+  displayDrawer: true,
   notifications: []
 };
 
