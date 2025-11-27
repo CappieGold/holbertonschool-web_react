@@ -20,10 +20,10 @@ class Notifications extends React.Component {
     const { displayDrawer, notifications } = this.props;
 
     return (
-      <div className="absolute right-3 top-3 z-50">
-        <div className="text-right mb-2 cursor-pointer font-medium">
+      <div className="absolute right-0 top-0">
+        <p className="text-right mb-1 cursor-pointer">
           Your notifications
-        </div>
+        </p>
         
         {displayDrawer && (
           <div className="relative border-2 border-dashed border-[var(--color-main)] bg-white w-[25vw] p-1.5">
@@ -38,7 +38,7 @@ class Notifications extends React.Component {
               <p>No new notification for now</p>
             ) : (
               <>
-                <p className="mb-2">Here is the list of notifications</p>
+                <p>Here is the list of notifications</p>
                 <ul className="list-square list-inside m-0 p-0">
                   {notifications.map((notification) => (
                     <NotificationItem
