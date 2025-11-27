@@ -6,9 +6,11 @@ class BodySection extends React.Component {
     const { title, children } = this.props;
 
     return (
-      <div className="bodySection mb-5">
+      <div className="bodySection max-w-full">
         <h2 className="font-bold text-xl mt-8">{title}</h2>
-        {children}
+        <div className="max-w-full overflow-hidden">
+          {children}
+        </div>
       </div>
     );
   }

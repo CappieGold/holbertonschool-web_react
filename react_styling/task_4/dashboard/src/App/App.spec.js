@@ -69,7 +69,7 @@ describe('App Component', () => {
     });
     expect(newsTitle).toBeInTheDocument();
 
-    const newsParagraph = screen.getByText(/holberton school news goes here/i);
+    const newsParagraph = screen.getByText(/ipsum Lorem ipsum dolor sit amet/i);
     expect(newsParagraph).toBeInTheDocument();
   });
 });

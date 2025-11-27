@@ -7,7 +7,7 @@ class BodySectionWithMarginBottom extends React.Component {
     const { title, children } = this.props;
 
     return (
-      <div className="bodySectionWithMargin">
+      <div className="bodySectionWithMargin mb-10 max-w-full">
         <BodySection title={title}>
           {children}
         </BodySection>
