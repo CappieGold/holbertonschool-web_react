@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import BodySection from './BodySection';
 
 class BodySectionWithMarginBottom extends React.Component {
   render() {
+    const { title, children } = this.props;
+
     return (
       <div className="bodySectionWithMargin mb-10">
-        <BodySection {...this.props} />
+        <h2 className="font-bold border-b-[3px] border-b-[var(--color-main)] mb-4">{title}</h2>
+        {children}
       </div>
     );
   }

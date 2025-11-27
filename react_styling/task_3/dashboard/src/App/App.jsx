@@ -52,17 +52,19 @@ class App extends React.Component {
         <Header />
         <div className="App-body p-9 min-h-[50vh]">
           {isLoggedIn ? (
-            <BodySectionWithMarginBottom title="Course list">
+            <BodySection title="Course list">
               <CourseList courses={listCourses} />
-            </BodySectionWithMarginBottom>
+            </BodySection>
           ) : (
             <BodySectionWithMarginBottom title="Log in to continue">
               <Login />
             </BodySectionWithMarginBottom>
           )}
-          <BodySection title="News from the School">
-            <p>Holberton School News goes here</p>
-          </BodySection>
+          <div className="mt-40">
+            <BodySection title="News from the School">
+              <p>Holberton School news goes here</p>
+            </BodySection>
+          </div>
         </div>
         <Footer />
       </React.Fragment>
