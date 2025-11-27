@@ -27,19 +27,18 @@ class Notifications extends React.Component {
         
         {displayDrawer && (
           <div className="relative border-2 border-dashed border-[var(--color-main)] bg-white w-[25vw] p-1.5">
-            <button 
-              className="absolute top-1 right-1 cursor-pointer bg-transparent border-none text-lg"
-              aria-label="Close"
-            >
-              ×
-            </button>
-            
             {notifications.length === 0 ? (
               <p>No new notification for now</p>
             ) : (
               <>
+                <button 
+                  className="absolute top-1 right-1 cursor-pointer bg-transparent border-none text-lg"
+                  aria-label="Close"
+                >
+                  ×
+                </button>
                 <p>Here is the list of notifications</p>
-                <ul className="list-square list-inside m-0 p-0">
+                <ul className="m-0 p-0">
                   {notifications.map((notification) => (
                     <NotificationItem
                       key={notification.id}
