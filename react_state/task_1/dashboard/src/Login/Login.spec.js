@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Login from './Login';
 
@@ -7,21 +7,21 @@ describe('Login Component', () => {
     render(<Login />);
   });
 
-  test('contains 2 labels, 2 inputs, and 1 button', () => {
+  test('contains 2 labels, 2 inputs (+ submit), and a submit input', () => {
     const { container } = render(<Login />);
     
     const labels = container.querySelectorAll('label');
     expect(labels).toHaveLength(2);
     
     const inputs = container.querySelectorAll('input');
-    expect(inputs).toHaveLength(2);
+    expect(inputs).toHaveLength(3);
     
-    const buttons = container.querySelectorAll('button');
-    expect(buttons).toHaveLength(1);
+    const submitInput = screen.getByRole('button', { name: /ok/i });
+    expect(submitInput).toBeInTheDocument();
+    expect(submitInput).toHaveAttribute('type', 'submit');
     
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /ok/i })).toBeInTheDocument();
   });
 
   test('inputs get focused when their related labels are clicked', async () => {
@@ -36,5 +36,96 @@ describe('Login Component', () => {
     
     await user.click(passwordInput);
     expect(passwordInput).toHaveFocus();
+  });
+
+  test('submit button is disabled by default', () => {
+    render(<Login />);
+    
+    const submitButton = screen.getByRole('button', { name: /ok/i });
+    expect(submitButton).toBeDisabled();
+  });
+
+  test('submit button becomes enabled after entering valid email and password (8+ chars)', async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const submitButton = screen.getByRole('button', { name: /ok/i });
+    
+    expect(submitButton).toBeDisabled();
+    
+    await user.type(emailInput, 'invalid');
+    expect(submitButton).toBeDisabled();
+    
+    await user.clear(emailInput);
+    await user.type(emailInput, 'test@example.com');
+    expect(submitButton).toBeDisabled();
+    
+    await user.type(passwordInput, '1234567');
+    expect(submitButton).toBeDisabled();
+    
+    await user.clear(passwordInput);
+    await user.type(passwordInput, '12345678');
+    expect(submitButton).toBeEnabled();
+  });
+
+  test('submit button becomes disabled when a field becomes invalid', async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const submitButton = screen.getByRole('button', { name: /ok/i });
+
+    await user.type(emailInput, 'test@example.com');
+    await user.type(passwordInput, '12345678');
+    expect(submitButton).toBeEnabled();
+
+    await user.clear(emailInput);
+    expect(submitButton).toBeDisabled();
+
+    await user.type(emailInput, 'test@example.com');
+    expect(submitButton).toBeEnabled();
+    
+    await user.clear(passwordInput);
+    expect(submitButton).toBeDisabled();
+  });
+
+  test('form submission does not reload the page', async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const form = screen.getByRole('button', { name: /ok/i }).closest('form');
+
+    await user.type(emailInput, 'test@example.com');
+    await user.type(passwordInput, '12345678');
+    
+    const submitHandler = jest.fn((e) => e.preventDefault());
+    form.addEventListener('submit', submitHandler);
+    
+    const submitButton = screen.getByRole('button', { name: /ok/i });
+    await user.click(submitButton);
+    
+    expect(submitHandler).toHaveBeenCalled();
+  });
+
+  test('email and password inputs are controlled components', async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    
+    expect(emailInput).toHaveValue('');
+    expect(passwordInput).toHaveValue('');
+    
+    await user.type(emailInput, 'hello@world.com');
+    await user.type(passwordInput, 'secret123');
+    
+    expect(emailInput).toHaveValue('hello@world.com');
+    expect(passwordInput).toHaveValue('secret123');
   });
 });
