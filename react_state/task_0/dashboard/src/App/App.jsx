@@ -24,7 +24,12 @@ const coursesList = [
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      displayDrawer: false
+    };
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleDisplayDrawer = this.handleDisplayDrawer.bind(this);
+    this.handleHideDrawer = this.handleHideDrawer.bind(this);
   }
 
   componentDidMount() {
@@ -44,13 +49,27 @@ class App extends React.Component {
     }
   }
 
+  handleDisplayDrawer() {
+    this.setState({ displayDrawer: true });
+  }
+
+  handleHideDrawer() {
+    this.setState({ displayDrawer: false });
+  }
+
   render() {
-    const { isLoggedIn = false, displayDrawer = true } = this.props;
+    const { isLoggedIn = false } = this.props;
+    const { displayDrawer } = this.state;
 
     return (
       <div className="relative px-3 min-h-screen flex flex-col">
         <div className="absolute top-0 right-0 z-10">
-          <Notifications notifications={notificationsList} displayDrawer={displayDrawer} />
+          <Notifications
+            notifications={notificationsList}
+            displayDrawer={displayDrawer}
+            handleDisplayDrawer={this.handleDisplayDrawer}
+            handleHideDrawer={this.handleHideDrawer}
+          />
         </div>
         <div className="flex-1">
           <Header />
@@ -77,13 +96,11 @@ class App extends React.Component {
 
 App.propTypes = {
   isLoggedIn: PropTypes.bool,
-  displayDrawer: PropTypes.bool,
   logOut: PropTypes.func
 };
 
 App.defaultProps = {
   isLoggedIn: false,
-  displayDrawer: true,
   logOut: () => {}
 };
 

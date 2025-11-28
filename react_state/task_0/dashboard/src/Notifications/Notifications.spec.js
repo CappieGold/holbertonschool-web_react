@@ -109,4 +109,42 @@ describe('Notifications Component', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
     expect(screen.getByText('Third notification')).toBeInTheDocument();
   });
+
+  test('clicking on menu item calls handleDisplayDrawer', () => {
+    const handleDisplayDrawerMock = jest.fn();
+
+    render(
+      <Notifications
+        notifications={sampleNotifications}
+        displayDrawer={false}
+        handleDisplayDrawer={handleDisplayDrawerMock}
+        handleHideDrawer={() => {}}
+      />
+    );
+
+    const menuItem = screen.getByText(/your notifications/i);
+    fireEvent.click(menuItem);
+
+    expect(handleDisplayDrawerMock).toHaveBeenCalled();
+    expect(handleDisplayDrawerMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('clicking on close button calls handleHideDrawer', () => {
+    const handleHideDrawerMock = jest.fn();
+
+    render(
+      <Notifications
+        notifications={sampleNotifications}
+        displayDrawer={true}
+        handleDisplayDrawer={() => {}}
+        handleHideDrawer={handleHideDrawerMock}
+      />
+    );
+
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeButton);
+
+    expect(handleHideDrawerMock).toHaveBeenCalled();
+    expect(handleHideDrawerMock).toHaveBeenCalledTimes(1);
+  });
 });

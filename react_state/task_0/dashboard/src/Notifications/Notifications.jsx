@@ -21,13 +21,21 @@ class Notifications extends React.Component {
   }
 
   render() {
-    const { displayDrawer = false, notifications = [] } = this.props;
+    const {
+      displayDrawer = false,
+      notifications = [],
+      handleDisplayDrawer,
+      handleHideDrawer
+    } = this.props;
 
     const shouldBounce = notifications.length > 0 && !displayDrawer;
 
     return (
       <>
-        <div className={`notification-title absolute right-3 top-1 whitespace-nowrap ${shouldBounce ? 'animate-bounce' : ''}`}>
+        <div
+          className={`notification-title absolute right-3 top-1 whitespace-nowrap cursor-pointer ${shouldBounce ? 'animate-bounce' : ''}`}
+          onClick={handleDisplayDrawer}
+        >
           Your notifications
         </div>
         {displayDrawer ? (
@@ -36,7 +44,7 @@ class Notifications extends React.Component {
               <div className="relative">
                 <p className="m-0 max-[912px]:text-[20px]">Here is the list of notifications</p>
                 <button
-                  onClick={() => console.log('Close button has been clicked')}
+                  onClick={handleHideDrawer}
                   aria-label="Close"
                   className="absolute cursor-pointer right-0 top-0 bg-transparent"
                 >
@@ -76,12 +84,16 @@ Notifications.propTypes = {
         __html: PropTypes.string
       })
     })
-  )
+  ),
+  handleDisplayDrawer: PropTypes.func,
+  handleHideDrawer: PropTypes.func
 };
 
 Notifications.defaultProps = {
   displayDrawer: false,
-  notifications: []
+  notifications: [],
+  handleDisplayDrawer: () => {},
+  handleHideDrawer: () => {}
 };
 
 export default Notifications;

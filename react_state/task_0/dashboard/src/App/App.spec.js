@@ -72,4 +72,34 @@ describe('App Component', () => {
     const newsParagraph = screen.getByText(/ipsum Lorem ipsum dolor sit amet/i);
     expect(newsParagraph).toBeInTheDocument();
   });
+
+  test('displayDrawer state is false by default', () => {
+    render(<App />);
+    expect(screen.queryByText(/here is the list of notifications/i)).not.toBeInTheDocument();
+  });
+
+  test('clicking on "Your notifications" shows the notifications panel', () => {
+    render(<App />);
+
+    expect(screen.queryByText(/here is the list of notifications/i)).not.toBeInTheDocument();
+    
+    const notificationTitle = screen.getByText(/your notifications/i);
+    fireEvent.click(notificationTitle);
+    
+    expect(screen.getByText(/here is the list of notifications/i)).toBeInTheDocument();
+  });
+
+  test('clicking on close button hides the notifications panel', () => {
+    render(<App />);
+    
+    const notificationTitle = screen.getByText(/your notifications/i);
+    fireEvent.click(notificationTitle);
+    
+    expect(screen.getByText(/here is the list of notifications/i)).toBeInTheDocument();
+    
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeButton);
+    
+    expect(screen.queryByText(/here is the list of notifications/i)).not.toBeInTheDocument();
+  });
 });
