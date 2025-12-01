@@ -190,4 +190,65 @@ describe('App Component', () => {
 
     expect(document.querySelector('#logoutSection')).toBeInTheDocument();
   });
+
+  test('clicking on a notification removes it from the list and logs to console', () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    render(<App />);
+
+    const notificationTitle = screen.getByText(/your notifications/i);
+    fireEvent.click(notificationTitle);
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+
+    const firstNotification = screen.getByText('New course available');
+    fireEvent.click(firstNotification);
+
+    expect(consoleSpy).toHaveBeenCalledWith('Notification 1 has been marked as read');
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+
+    expect(screen.queryByText('New course available')).not.toBeInTheDocument();
+
+    consoleSpy.mockRestore();
+  });
+
+  test('can remove multiple notifications one by one', () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    render(<App />);
+
+    const notificationTitle = screen.getByText(/your notifications/i);
+    fireEvent.click(notificationTitle);
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+
+    fireEvent.click(screen.getByText('New course available'));
+    expect(consoleSpy).toHaveBeenCalledWith('Notification 1 has been marked as read');
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+
+    fireEvent.click(screen.getByText('New resume available'));
+    expect(consoleSpy).toHaveBeenCalledWith('Notification 2 has been marked as read');
+    expect(screen.getAllByRole('listitem')).toHaveLength(1);
+
+    consoleSpy.mockRestore();
+  });
+
+  test('"Contact us" link appears in Footer when user is logged in', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(screen.queryByText(/contact us/i)).not.toBeInTheDocument();
+
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+
+    await user.type(emailInput, 'test@example.com');
+    await user.type(passwordInput, '12345678');
+
+    const submitButton = screen.getByRole('button', { name: /ok/i });
+    await user.click(submitButton);
+
+    expect(screen.getByText(/contact us/i)).toBeInTheDocument();
+  });
 });

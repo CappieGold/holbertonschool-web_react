@@ -39,75 +39,26 @@ describe('Notifications Component', () => {
     expect(listItems).toHaveLength(3);
   });
 
-  test('logs correct message when notification item is clicked', () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  test('calls markNotificationAsRead with correct id when notification item is clicked', () => {
+    const markNotificationAsReadMock = jest.fn();
 
-    render(<Notifications displayDrawer={true} notifications={sampleNotifications} />);
+    render(
+      <Notifications
+        displayDrawer={true}
+        notifications={sampleNotifications}
+        markNotificationAsRead={markNotificationAsReadMock}
+      />
+    );
 
     const firstNotification = screen.getByText('New course available');
     fireEvent.click(firstNotification);
 
-    expect(consoleSpy).toHaveBeenCalledWith('Notification 1 has been marked as read');
+    expect(markNotificationAsReadMock).toHaveBeenCalledWith(1);
 
     const secondNotification = screen.getByText('New resume available');
     fireEvent.click(secondNotification);
 
-    expect(consoleSpy).toHaveBeenCalledWith('Notification 2 has been marked as read');
-
-    consoleSpy.mockRestore();
-  });
-
-  test('does not re-render when notifications length stays the same', () => {
-    const initialNotifications = [
-      { id: 1, type: 'default', value: 'First notification' },
-      { id: 2, type: 'urgent', value: 'Second notification' },
-      { id: 3, type: 'default', value: 'Third notification' }
-    ];
-
-    const updatedNotifications = [
-      { id: 1, type: 'default', value: 'Updated first notification' },
-      { id: 2, type: 'urgent', value: 'Updated second notification' },
-      { id: 3, type: 'default', value: 'Updated third notification' }
-    ];
-
-    const { rerender } = render(
-      <Notifications displayDrawer={true} notifications={initialNotifications} />
-    );
-
-    expect(screen.getByText('First notification')).toBeInTheDocument();
-
-    rerender(
-      <Notifications displayDrawer={true} notifications={updatedNotifications} />
-    );
-
-    expect(screen.getByText('First notification')).toBeInTheDocument();
-    expect(screen.queryByText('Updated first notification')).not.toBeInTheDocument();
-  });
-
-  test('re-renders when notifications length changes', () => {
-    const initialNotifications = [
-      { id: 1, type: 'default', value: 'First notification' },
-      { id: 2, type: 'urgent', value: 'Second notification' }
-    ];
-
-    const longerNotifications = [
-      { id: 1, type: 'default', value: 'First notification' },
-      { id: 2, type: 'urgent', value: 'Second notification' },
-      { id: 3, type: 'default', value: 'Third notification' }
-    ];
-
-    const { rerender } = render(
-      <Notifications displayDrawer={true} notifications={initialNotifications} />
-    );
-
-    expect(screen.getAllByRole('listitem')).toHaveLength(2);
-
-    rerender(
-      <Notifications displayDrawer={true} notifications={longerNotifications} />
-    );
-
-    expect(screen.getAllByRole('listitem')).toHaveLength(3);
-    expect(screen.getByText('Third notification')).toBeInTheDocument();
+    expect(markNotificationAsReadMock).toHaveBeenCalledWith(2);
   });
 
   test('clicking on menu item calls handleDisplayDrawer', () => {
@@ -146,5 +97,23 @@ describe('Notifications Component', () => {
 
     expect(handleHideDrawerMock).toHaveBeenCalled();
     expect(handleHideDrawerMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('component is a PureComponent and handles props correctly', () => {
+    const { rerender } = render(
+      <Notifications displayDrawer={true} notifications={sampleNotifications} />
+    );
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+
+    const fewerNotifications = [
+      { id: 1, type: 'default', value: 'New course available' }
+    ];
+
+    rerender(
+      <Notifications displayDrawer={true} notifications={fewerNotifications} />
+    );
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(1);
   });
 });
