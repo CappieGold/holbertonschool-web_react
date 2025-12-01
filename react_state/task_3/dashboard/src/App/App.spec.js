@@ -57,6 +57,9 @@ describe('App Component', () => {
     expect(screen.getByRole('heading', { level: 2, name: /course list/i })).toBeInTheDocument();
     const table = screen.getByRole('table');
     expect(table).toBeInTheDocument();
+
+    expect(screen.getByText(/welcome/i)).toBeInTheDocument();
+    expect(screen.getByText(/test@example.com/i)).toBeInTheDocument();
   });
 
   test('calls logOut and shows alert when ctrl+h is pressed', () => {
@@ -114,7 +117,7 @@ describe('App Component', () => {
     expect(screen.queryByText(/here is the list of notifications/i)).not.toBeInTheDocument();
   });
 
-  test('logOut resets user state and shows Login component again', async () => {
+  test('logOut resets user state and shows Login component again via Ctrl+H', async () => {
     const user = userEvent.setup();
     const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {});
 
@@ -130,11 +133,61 @@ describe('App Component', () => {
     await user.click(submitButton);
 
     expect(screen.getByRole('heading', { level: 2, name: /course list/i })).toBeInTheDocument();
+    expect(screen.getByText(/welcome/i)).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: 'h', ctrlKey: true });
 
     expect(screen.getByRole('heading', { level: 2, name: /log in to continue/i })).toBeInTheDocument();
+    expect(screen.queryByText(/welcome/i)).not.toBeInTheDocument();
 
     alertMock.mockRestore();
+  });
+
+  test('clicking logout link in Header logs out the user', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+
+    await user.type(emailInput, 'test@example.com');
+    await user.type(passwordInput, '12345678');
+
+    const submitButton = screen.getByRole('button', { name: /ok/i });
+    await user.click(submitButton);
+
+    expect(screen.getByRole('heading', { level: 2, name: /course list/i })).toBeInTheDocument();
+    expect(screen.getByText(/welcome/i)).toBeInTheDocument();
+
+    const logoutLink = screen.getByText(/logout/i);
+    await user.click(logoutLink);
+
+    expect(screen.getByRole('heading', { level: 2, name: /log in to continue/i })).toBeInTheDocument();
+    expect(screen.queryByText(/welcome/i)).not.toBeInTheDocument();
+  });
+
+  test('logoutSection is not visible when user is not logged in', () => {
+    render(<App />);
+    
+    const logoutSection = document.querySelector('#logoutSection');
+    expect(logoutSection).not.toBeInTheDocument();
+  });
+
+  test('logoutSection becomes visible after successful login', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(document.querySelector('#logoutSection')).not.toBeInTheDocument();
+
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+
+    await user.type(emailInput, 'test@example.com');
+    await user.type(passwordInput, '12345678');
+
+    const submitButton = screen.getByRole('button', { name: /ok/i });
+    await user.click(submitButton);
+
+    expect(document.querySelector('#logoutSection')).toBeInTheDocument();
   });
 });
