@@ -1,32 +1,25 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import WithLogging from '../HOC/WithLogging';
 
-class Login extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: props.email || '',
-      password: props.password || '',
-      enableSubmit: false
-    };
-
-    this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
-    this.handleChangeEmail = this.handleChangeEmail.bind(this);
-    this.handleChangePassword = this.handleChangePassword.bind(this);
-  }
+function Login({ logIn = () => {}, email: initialEmail = '', password: initialPassword = '' }) {
+  const [enableSubmit, setEnableSubmit] = useState(false);
+  const [formData, setFormData] = useState({
+    email: initialEmail,
+    password: initialPassword
+  });
 
   /**
    * Validates if the email has the correct format
    * @param {string} email - The email to validate
    * @returns {boolean} - true if the email is valid
    */
-  isValidEmail(email) {
+  const isValidEmail = (email) => {
     if (!email || typeof email !== 'string') return false;
     const trimmedEmail = email.trim();
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(trimmedEmail);
-  }
+  };
 
   /**
    * Checks if the form is valid
@@ -34,85 +27,66 @@ class Login extends React.Component {
    * @param {string} password - The password value
    * @returns {boolean} - true if the form is valid
    */
-  validateForm(email, password) {
-    const isEmailValid = email.length > 0 && this.isValidEmail(email);
+  const validateForm = (email, password) => {
+    const isEmailValid = email.length > 0 && isValidEmail(email);
     const isPasswordValid = password.length >= 8;
     return isEmailValid && isPasswordValid;
-  }
+  };
 
-  /**
-   * Handles form submission
-   * Calls the logIn method passed via props with email and password
-   * @param {Event} e - The submission event
-   */
-  handleLoginSubmit(e) {
-    e.preventDefault();
-    const { email, password } = this.state;
-    const { logIn } = this.props;
-    if (logIn) {
-      logIn(email, password);
-    }
-  }
-
-  /**
-   * Handles changes in the email field
-   * @param {Event} e - The change event
-   */
-  handleChangeEmail(e) {
+  const handleChangeEmail = (e) => {
     const newEmail = e.target.value;
-    this.setState((prevState) => ({
-      email: newEmail,
-      enableSubmit: this.validateForm(newEmail, prevState.password)
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      email: newEmail
     }));
-  }
+    setEnableSubmit(validateForm(newEmail, formData.password));
+  };
 
-  /**
-   * Handles changes in the password field
-   * @param {Event} e - The change event
-   */
-  handleChangePassword(e) {
+  const handleChangePassword = (e) => {
     const newPassword = e.target.value;
-    this.setState((prevState) => ({
-      password: newPassword,
-      enableSubmit: this.validateForm(prevState.email, newPassword)
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      password: newPassword
     }));
-  }
+    setEnableSubmit(validateForm(formData.email, newPassword));
+  };
 
-  render() {
-    const { email, password, enableSubmit } = this.state;
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    logIn(formData.email, formData.password);
+  };
 
-    return (
-      <div className="App-body flex flex-col p-5 pl-1 h-[45vh] border-t-4 border-[color:var(--main-color)]">
-        <p className="text-xl mb-4">Login to access the full dashboard</p>
-        <form onSubmit={this.handleLoginSubmit} className="text-lg flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0">
-          <label htmlFor="email" className="sm:pr-2">Email</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value={email}
-            onChange={this.handleChangeEmail}
-            className="border rounded w-3/5 sm:w-auto px-2 py-1"
-          />
-          <label htmlFor="password" className="sm:pl-2 sm:pr-2">Password</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={password}
-            onChange={this.handleChangePassword}
-            className="border rounded w-3/5 sm:w-auto px-2 py-1"
-          />
-          <input
-            type="submit"
-            value="OK"
-            disabled={!enableSubmit}
-            className="cursor-pointer border px-1 rounded sm:ml-2 w-fit disabled:opacity-50 disabled:cursor-not-allowed"
-          />
-        </form>
-      </div>
-    );
-  }
+  return (
+    <div className="App-body flex flex-col p-5 pl-1 h-[45vh] border-t-4 border-[color:var(--main-color)]">
+      <p className="text-xl mb-4">Login to access the full dashboard</p>
+      <form onSubmit={handleLoginSubmit} className="text-lg flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0">
+        <label htmlFor="email" className="sm:pr-2">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          value={formData.email}
+          onChange={handleChangeEmail}
+          className="border rounded w-3/5 sm:w-auto px-2 py-1"
+        />
+        <label htmlFor="password" className="sm:pl-2 sm:pr-2">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          value={formData.password}
+          onChange={handleChangePassword}
+          className="border rounded w-3/5 sm:w-auto px-2 py-1"
+        />
+        <input
+          type="submit"
+          value="OK"
+          disabled={!enableSubmit}
+          className="cursor-pointer border px-1 rounded sm:ml-2 w-fit disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+      </form>
+    </div>
+  );
 }
 
 Login.propTypes = {
