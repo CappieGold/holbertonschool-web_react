@@ -1,42 +1,14 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Footer from './Footer';
-import newContext from '../Context/context';
 import { getFooterCopy, getCurrentYear } from '../utils/utils';
 
 describe('Footer Component', () => {
-  const renderWithContext = (contextValue) => {
-    return render(
-      <newContext.Provider value={contextValue}>
-        <Footer />
-      </newContext.Provider>
-    );
-  };
-
-  const defaultContext = {
-    user: {
-      email: '',
-      password: '',
-      isLoggedIn: false
-    },
-    logOut: jest.fn()
-  };
-
-  const loggedInContext = {
-    user: {
-      email: 'test@example.com',
-      password: 'password123',
-      isLoggedIn: true
-    },
-    logOut: jest.fn()
-  };
-
   test('renders without crashing', () => {
-    renderWithContext(defaultContext);
+    render(<Footer user={{ isLoggedIn: false }} />);
   });
 
   test('renders copyright text with current year and correct text', () => {
-    renderWithContext(defaultContext);
+    render(<Footer user={{ isLoggedIn: false }} />);
     
     const currentYear = getCurrentYear();
     const footerText = getFooterCopy(false);
@@ -59,7 +31,7 @@ describe('Footer Component', () => {
   });
 
   test('displays the correct copyright text format', () => {
-    renderWithContext(defaultContext);
+    render(<Footer user={{ isLoggedIn: false }} />);
     
     const currentYear = new Date().getFullYear();
     
@@ -71,14 +43,14 @@ describe('Footer Component', () => {
   });
 
   test('"Contact us" link is not displayed when user is logged out', () => {
-    renderWithContext(defaultContext);
+    render(<Footer user={{ isLoggedIn: false }} />);
 
     const contactLink = screen.queryByText(/contact us/i);
     expect(contactLink).not.toBeInTheDocument();
   });
 
   test('"Contact us" link is displayed when user is logged in', () => {
-    renderWithContext(loggedInContext);
+    render(<Footer user={{ isLoggedIn: true, email: 'test@example.com' }} />);
 
     const contactLink = screen.getByText(/contact us/i);
     expect(contactLink).toBeInTheDocument();

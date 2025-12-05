@@ -1,38 +1,21 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Header from './Header';
-import newContext from '../Context/context';
 
 describe('Header Component', () => {
-  const defaultContext = {
-    user: {
-      email: '',
-      password: '',
-      isLoggedIn: false
-    },
-    logOut: jest.fn()
-  };
-
-  const renderWithContext = (contextValue = defaultContext) => {
-    return render(
-      <newContext.Provider value={contextValue}>
-        <Header />
-      </newContext.Provider>
-    );
-  };
-
   test('renders without crashing', () => {
-    renderWithContext();
+    render(<Header user={{ isLoggedIn: false }} logOut={() => {}} />);
   });
 
   test('contains the Holberton logo', () => {
-    renderWithContext();
+    render(<Header user={{ isLoggedIn: false }} logOut={() => {}} />);
     const logo = screen.getByAltText(/holberton logo/i);
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute('src');
   });
 
   test('contains h1 element with correct text', () => {
-    renderWithContext();
+    render(<Header user={{ isLoggedIn: false }} logOut={() => {}} />);
     const heading = screen.getByRole('heading', { 
       level: 1, 
       name: /school dashboard/i 
@@ -41,8 +24,8 @@ describe('Header Component', () => {
     expect(heading).toHaveTextContent('School Dashboard');
   });
 
-  test('logoutSection is not rendered with default context value', () => {
-    renderWithContext();
+  test('logoutSection is not rendered when user is not logged in', () => {
+    render(<Header user={{ isLoggedIn: false }} logOut={() => {}} />);
     
     const logoutSection = document.querySelector('#logoutSection');
     expect(logoutSection).not.toBeInTheDocument();
@@ -51,42 +34,36 @@ describe('Header Component', () => {
   });
 
   test('logoutSection is rendered when user is logged in', () => {
-    const loggedInContext = {
-      user: {
-        email: 'test@example.com',
-        password: 'password123',
-        isLoggedIn: true
-      },
-      logOut: jest.fn()
+    const loggedInUser = {
+      email: 'test@example.com',
+      password: 'password123',
+      isLoggedIn: true
     };
 
-    renderWithContext(loggedInContext);
+    render(<Header user={loggedInUser} logOut={() => {}} />);
 
     const logoutSection = document.querySelector('#logoutSection');
     expect(logoutSection).toBeInTheDocument();
 
     expect(screen.getByText(/welcome/i)).toBeInTheDocument();
     expect(screen.getByText(/test@example.com/i)).toBeInTheDocument();
-
     expect(screen.getByText(/logout/i)).toBeInTheDocument();
   });
 
-  test('clicking logout link calls the logOut function from context', () => {
+  test('clicking logout link calls the logOut function', async () => {
+    const user = userEvent.setup();
     const logOutSpy = jest.fn();
 
-    const loggedInContext = {
-      user: {
-        email: 'test@example.com',
-        password: 'password123',
-        isLoggedIn: true
-      },
-      logOut: logOutSpy
+    const loggedInUser = {
+      email: 'test@example.com',
+      password: 'password123',
+      isLoggedIn: true
     };
 
-    renderWithContext(loggedInContext);
+    render(<Header user={loggedInUser} logOut={logOutSpy} />);
 
     const logoutLink = screen.getByText(/logout/i);
-    fireEvent.click(logoutLink);
+    await user.click(logoutLink);
 
     expect(logOutSpy).toHaveBeenCalledTimes(1);
   });

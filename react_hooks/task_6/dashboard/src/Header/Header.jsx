@@ -1,9 +1,10 @@
-import { useContext } from 'react';
 import logo from '../assets/holberton-logo.jpg';
-import newContext from '../Context/context';
 
-export default function Header() {
-    const { user, logOut } = useContext(newContext)
+export default function Header({ user, logOut }) {
+  const handleLogoutClick = (e) => {
+    e.preventDefault();
+    logOut();
+  };
 
   return (
     <div className="App-header flex flex-col">
@@ -15,13 +16,10 @@ export default function Header() {
       </div>
       {user.isLoggedIn && (
         <section id="logoutSection" className="text-right pr-4">
-          Welcome {user.email} (
+          Welcome <b>{user.email}</b> (
           <a
             href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              logOut();
-            }}
+            onClick={handleLogoutClick}
             className="text-blue-600 hover:underline cursor-pointer"
           >
             logout

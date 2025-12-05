@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useReducer, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Notifications from '../Notifications/Notifications';
 import Header from '../Header/Header';
@@ -8,7 +8,7 @@ import CourseList from '../CourseList/CourseList';
 import BodySection from '../BodySection/BodySection';
 import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBottom';
 import { getLatestNotification } from '../utils/utils';
-import newContext from '../Context/context';
+import { APP_ACTIONS, appReducer, initialState } from './appReducer';
 
 const API_BASE_URL = 'http://localhost:5173';
 const ENDPOINTS = {
@@ -17,36 +17,40 @@ const ENDPOINTS = {
 };
 
 export default function App() {
-  const [displayDrawer, setDisplayDrawer] = useState(true);
-  const [user, setUser] = useState({ ...newContext.user });
-  const [notifications, setNotifications] = useState([]);
-  const [courses, setCourses] = useState([]);
+  const [state, dispatch] = useReducer(appReducer, initialState);
+
+  const handleDisplayDrawer = useCallback(() => {
+    dispatch({ type: APP_ACTIONS.TOGGLE_DRAWER });
+  }, []);
+
+  const handleHideDrawer = useCallback(() => {
+    dispatch({ type: APP_ACTIONS.TOGGLE_DRAWER });
+  }, []);
+
+  const logIn = useCallback((email, password) => {
+    dispatch({ type: APP_ACTIONS.LOGIN, payload: { email, password } });
+  }, []);
+
+  const logOut = useCallback(() => {
+    dispatch({ type: APP_ACTIONS.LOGOUT });
+  }, []);
+
+  const markNotificationAsRead = useCallback((id) => {
+    dispatch({ type: APP_ACTIONS.MARK_NOTIFICATION_READ, payload: id });
+    console.log(`Notification ${id} has been marked as read`);
+  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(ENDPOINTS.notifications);
-
-        const latestNotif = {
-          id: 3,
-          type: 'urgent',
-          html: { __html: getLatestNotification() }
-        };
-        
-        const currentNotifications = response.data.notifications;
-
-        const indexToReplace = currentNotifications.findIndex(
-          notification => notification.id === 3
-        );
-
-        const updatedNotifications = [...currentNotifications];
-        if (indexToReplace !== -1) {
-          updatedNotifications[indexToReplace] = latestNotif;
-        } else {
-          updatedNotifications.push(latestNotif);
-        }
-        
-        setNotifications(updatedNotifications);
+        const notificationsList = (response.data.notifications || response.data).map((notif) => {
+          if ((!notif.value && !notif.html) || notif.id === 3) {
+            return { ...notif, html: { __html: getLatestNotification() } };
+          }
+          return notif;
+        });
+        dispatch({ type: APP_ACTIONS.SET_NOTIFICATIONS, payload: notificationsList });
       } catch (error) {
         console.error('Error fetching notifications:', error);
       }
@@ -59,82 +63,43 @@ export default function App() {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(ENDPOINTS.courses);
-        setCourses(response.data.courses);
+        const coursesList = response.data.courses || response.data;
+        dispatch({ type: APP_ACTIONS.SET_COURSES, payload: coursesList });
       } catch (error) {
         console.error('Error fetching courses:', error);
       }
     };
 
-    if (!user.isLoggedIn) {
-      setCourses([]);
-      return;
+    if (state.user.isLoggedIn) {
+      fetchCourses();
     }
-
-    fetchCourses();
-  }, [user.isLoggedIn]);
-
-  const handleDisplayDrawer = useCallback(() => {
-    setDisplayDrawer(true);
-  }, []);
-
-  const handleHideDrawer = useCallback(() => {
-    setDisplayDrawer(false);
-  }, []);
-
-  const logIn = (email, password) => {
-    setUser({
-      email,
-      password,
-      isLoggedIn: true
-    });
-  };
-
-  const logOut = () => {
-    setUser({
-      email: '',
-      password: '',
-      isLoggedIn: false,
-    });
-  };
-
-  const markNotificationAsRead = useCallback((id) => {
-    setNotifications(prev =>
-      prev.filter(notification => notification.id !== id)
-    );
-    console.log(`Notification ${id} has been marked as read`);
-  }, []);
+  }, [state.user.isLoggedIn]);
 
   return (
-    <newContext.Provider value={{ user, logOut }}>
-      <div className="relative px-3 min-h-screen flex flex-col">
-        <Notifications
-          notifications={notifications}
-          handleHideDrawer={handleHideDrawer}
-          handleDisplayDrawer={handleDisplayDrawer}
-          displayDrawer={displayDrawer}
-          markNotificationAsRead={markNotificationAsRead}
-        />
-        <>
-          <Header />
-          {!user.isLoggedIn ? (
-            <BodySectionWithMarginBottom title="Log in to continue">
-              <Login
-                logIn={logIn}
-                email={user.email}
-                password={user.password}
-              />
-            </BodySectionWithMarginBottom>
-          ) : (
-            <BodySectionWithMarginBottom title="Course list">
-              <CourseList courses={courses} />
-            </BodySectionWithMarginBottom>
-          )}
-          <BodySection title="News from the School">
-            <p>Holberton School news goes here</p>
-          </BodySection>
-        </>
-        <Footer />
-      </div>
-    </newContext.Provider>
+    <div className="relative px-3 min-h-screen flex flex-col">
+      <Notifications
+        notifications={state.notifications}
+        displayDrawer={state.displayDrawer}
+        handleDisplayDrawer={handleDisplayDrawer}
+        handleHideDrawer={handleHideDrawer}
+        markNotificationAsRead={markNotificationAsRead}
+      />
+      <>
+        <Header user={state.user} logOut={logOut} />
+        {!state.user.isLoggedIn ? (
+          <BodySectionWithMarginBottom title="Log in to continue">
+            <Login logIn={logIn} />
+          </BodySectionWithMarginBottom>
+        ) : (
+          <BodySectionWithMarginBottom title="Course list">
+            <CourseList courses={state.courses} />
+          </BodySectionWithMarginBottom>
+        )}
+        <BodySection title="News from the School">
+          <p>Holberton School news goes here</p>
+        </BodySection>
+      </>
+      <Footer user={state.user} />
+    </div>
   );
 }
