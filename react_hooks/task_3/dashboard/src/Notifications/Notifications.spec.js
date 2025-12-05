@@ -99,7 +99,25 @@ describe('Notifications Component', () => {
     expect(handleHideDrawerMock).toHaveBeenCalledTimes(1);
   });
 
-  test('component is a PureComponent and handles props correctly', () => {
+  test('component is memoized (wrapped with React.memo)', () => {
+    expect(Notifications.$$typeof).toBe(Symbol.for('react.memo'));
+  });
+
+  test('re-renders when displayDrawer changes', () => {
+    const { rerender } = render(
+      <Notifications displayDrawer={false} notifications={sampleNotifications} />
+    );
+
+    expect(screen.queryByText('New course available')).not.toBeInTheDocument();
+
+    rerender(
+      <Notifications displayDrawer={true} notifications={sampleNotifications} />
+    );
+
+    expect(screen.getByText('New course available')).toBeInTheDocument();
+  });
+
+  test('re-renders when notifications array length changes', () => {
     const { rerender } = render(
       <Notifications displayDrawer={true} notifications={sampleNotifications} />
     );
@@ -115,5 +133,62 @@ describe('Notifications Component', () => {
     );
 
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
+  });
+
+  test('notification title has bounce animation when notifications exist and drawer is closed', () => {
+    render(<Notifications displayDrawer={false} notifications={sampleNotifications} />);
+    
+    const title = screen.getByText(/your notifications/i);
+    expect(title).toHaveClass('animate-bounce');
+  });
+
+  test('notification title does not have bounce animation when drawer is open', () => {
+    render(<Notifications displayDrawer={true} notifications={sampleNotifications} />);
+    
+    const title = screen.getByText(/your notifications/i);
+    expect(title).not.toHaveClass('animate-bounce');
+  });
+
+  test('notification title does not have bounce animation when no notifications', () => {
+    render(<Notifications displayDrawer={false} notifications={[]} />);
+    
+    const title = screen.getByText(/your notifications/i);
+    expect(title).not.toHaveClass('animate-bounce');
+  });
+
+  test('renders HTML content correctly in notification item', () => {
+    render(<Notifications displayDrawer={true} notifications={sampleNotifications} />);
+    
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems[2].innerHTML).toContain('<strong>Urgent requirement</strong>');
+  });
+
+  test('does not re-render when props remain the same', () => {
+    const markNotificationAsReadMock = jest.fn();
+    const handleDisplayDrawerMock = jest.fn();
+    const handleHideDrawerMock = jest.fn();
+
+    const { rerender } = render(
+      <Notifications
+        displayDrawer={true}
+        notifications={sampleNotifications}
+        handleDisplayDrawer={handleDisplayDrawerMock}
+        handleHideDrawer={handleHideDrawerMock}
+        markNotificationAsRead={markNotificationAsReadMock}
+      />
+    );
+
+    rerender(
+      <Notifications
+        displayDrawer={true}
+        notifications={sampleNotifications}
+        handleDisplayDrawer={handleDisplayDrawerMock}
+        handleHideDrawer={handleHideDrawerMock}
+        markNotificationAsRead={markNotificationAsReadMock}
+      />
+    );
+
+    expect(screen.getByText('New course available')).toBeInTheDocument();
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
   });
 });
