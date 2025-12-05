@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import axios from 'axios';
 import Notifications from '../Notifications/Notifications';
 import Header from '../Header/Header';
 import Login from '../Login/Login';
@@ -9,17 +10,11 @@ import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBot
 import { getLatestNotification } from '../utils/utils';
 import newContext from '../Context/context';
 
-const notificationsList = [
-  { id: 1, type: 'default', value: 'New course available' },
-  { id: 2, type: 'urgent', value: 'New resume available' },
-  { id: 3, type: 'urgent', html: { __html: getLatestNotification() } }
-];
-
-const coursesList = [
-  { id: 1, name: 'ES6', credit: 60 },
-  { id: 2, name: 'Webpack', credit: 20 },
-  { id: 3, name: 'React', credit: 40 }
-];
+const API_BASE_URL = 'http://localhost:5173';
+const ENDPOINTS = {
+  courses: `${API_BASE_URL}/courses.json`,
+  notifications: `${API_BASE_URL}/notifications.json`,
+};
 
 const defaultUser = {
   email: '',
@@ -28,9 +23,61 @@ const defaultUser = {
 };
 
 function App() {
-  const [displayDrawer, setDisplayDrawer] = useState(false);
-  const [user, setUser] = useState(defaultUser);
-  const [notifications, setNotifications] = useState(notificationsList);
+  const [displayDrawer, setDisplayDrawer] = useState(true);
+  const [user, setUser] = useState({ ...newContext.user });
+  const [notifications, setNotifications] = useState([]);
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(ENDPOINTS.notifications);
+
+        const latestNotif = {
+          id: 3,
+          type: 'urgent',
+          html: { __html: getLatestNotification() }
+        };
+        
+        const currentNotifications = response.data.notifications;
+
+        const indexToReplace = currentNotifications.findIndex(
+          notification => notification.id === 3
+        );
+
+        const updatedNotifications = [...currentNotifications];
+        if (indexToReplace !== -1) {
+          updatedNotifications[indexToReplace] = latestNotif;
+        } else {
+          updatedNotifications.push(latestNotif);
+        }
+        
+        setNotifications(updatedNotifications);
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get(ENDPOINTS.courses);
+        setCourses(response.data.courses);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    };
+
+    if (!user.isLoggedIn) {
+      setCourses([]);
+      return;
+    }
+
+    fetchCourses();
+  }, [user.isLoggedIn]);
 
   const handleDisplayDrawer = useCallback(() => {
     setDisplayDrawer(true);
@@ -40,28 +87,27 @@ function App() {
     setDisplayDrawer(false);
   }, []);
 
-  const logIn = useCallback((email, password) => {
+  const logIn = (email, password) => {
     setUser({
       email: email,
       password: password,
       isLoggedIn: true
     });
-  }, []);
+  };
 
-  const logOut = useCallback(() => {
+  const logOut = () => {
     setUser({
       email: '',
       password: '',
       isLoggedIn: false
     });
-  }, []);
+  };
 
   const markNotificationAsRead = useCallback((id) => {
-    console.log(`Notification ${id} has been marked as read`);
-    
     setNotifications((prevNotifications) => 
       prevNotifications.filter((notification) => notification.id !== id)
     );
+    console.log(`Notification ${id} has been marked as read`);
   }, []);
 
   const contextValue = {
@@ -93,13 +139,11 @@ function App() {
             </BodySectionWithMarginBottom>
           ) : (
             <BodySectionWithMarginBottom title="Course list">
-              <CourseList courses={coursesList} />
+              <CourseList courses={courses} />
             </BodySectionWithMarginBottom>
           )}
           <BodySection title="News from the School">
-            <p>
-              ipsum Lorem ipsum dolor sit amet consectetur, adipisicing elit. Similique, asperiores architecto blanditiis fuga doloribus sit illum aliquid ea distinctio minus accusantium, impedit quo voluptatibus ut magni dicta. Recusandae, quia dicta?
-            </p>
+            <p>Holberton School news goes here</p>
           </BodySection>
         </div>
         <Footer />
