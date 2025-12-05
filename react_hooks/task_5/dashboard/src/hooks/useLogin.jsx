@@ -1,50 +1,50 @@
 import { useState } from 'react';
 
-function useLogin(onLogin) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function useLogin(onLogin) {
   const [enableSubmit, setEnableSubmit] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
 
-  const isValidEmail = (emailValue) => {
-    if (!emailValue || typeof emailValue !== 'string') return false;
-    const trimmedEmail = emailValue.trim();
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(trimmedEmail);
-  };
-
-  const validateForm = (emailValue, passwordValue) => {
-    const isEmailValid = emailValue.length > 0 && isValidEmail(emailValue);
-    const isPasswordValid = passwordValue.length >= 8;
-    return isEmailValid && isPasswordValid;
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleChangeEmail = (e) => {
     const newEmail = e.target.value;
-    setEmail(newEmail);
-    setEnableSubmit(validateForm(newEmail, password));
+    const { password } = formData;
+    
+    setFormData(prev => ({
+      ...prev,
+      email: newEmail
+    }));
+    setEnableSubmit(validateEmail(newEmail) && password.length >= 8);
   };
 
   const handleChangePassword = (e) => {
     const newPassword = e.target.value;
-    setPassword(newPassword);
-    setEnableSubmit(validateForm(email, newPassword));
+    const { email } = formData;
+    
+    setFormData(prev => ({
+      ...prev,
+      password: newPassword
+    }));
+    setEnableSubmit(validateEmail(email) && newPassword.length >= 8);
   };
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    if (onLogin && enableSubmit) {
-      onLogin(email, password);
-    }
+    onLogin(formData.email, formData.password);
   };
 
   return {
-    email,
-    password,
+    email: formData.email,
+    password: formData.password,
     enableSubmit,
     handleChangeEmail,
     handleChangePassword,
     handleLoginSubmit
   };
 }
-
-export default useLogin;

@@ -1,8 +1,7 @@
-import PropTypes from 'prop-types';
 import WithLogging from '../HOC/WithLogging';
 import useLogin from '../hooks/useLogin';
 
-function Login({ logIn = () => {} }) {
+const Login = ({ logIn }) => {
   const {
     email,
     password,
@@ -13,40 +12,43 @@ function Login({ logIn = () => {} }) {
   } = useLogin(logIn);
 
   return (
-    <div className="App-body flex flex-col p-5 pl-1 h-[45vh] border-t-4 border-[color:var(--main-color)]">
-      <p className="text-xl mb-4">Login to access the full dashboard</p>
-      <form onSubmit={handleLoginSubmit} className="text-lg flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0">
-        <label htmlFor="email" className="sm:pr-2">Email</label>
+    <div className="flex flex-col h-[60vh] p-5 pl-10 border-t-4 border-[#e1003c]">
+      <p className="font-roboto text-xl">Login to access the full dashboard</p>
+      <form 
+        className="my-5 text-lg font-roboto flex flex-row max-[900px]:flex-col" 
+        onSubmit={handleLoginSubmit}
+      >
+        <label htmlFor="email" className="pr-2.5 max-[900px]:block">
+          Email
+        </label>
         <input
           type="email"
-          name="email"
+          name="user_email"
           id="email"
+          className="mr-2.5 border rounded px-2 py-1 max-[900px]:block max-[900px]:mb-2.5 max-[900px]:py-1.5 max-[900px]:text-xl max-[900px]:w-full max-[900px]:box-border"
           value={email}
           onChange={handleChangeEmail}
-          className="border rounded w-3/5 sm:w-auto px-2 py-1"
         />
-        <label htmlFor="password" className="sm:pl-2 sm:pr-2">Password</label>
+        <label htmlFor="password" className="pr-2.5 max-[900px]:block">
+          Password
+        </label>
         <input
           type="password"
-          name="password"
+          name="user_password"
           id="password"
+          className="mr-2.5 border rounded px-2 py-1 max-[900px]:block max-[900px]:mb-2.5 max-[900px]:py-1.5 max-[900px]:text-xl max-[900px]:w-full max-[900px]:box-border"
           value={password}
           onChange={handleChangePassword}
-          className="border rounded w-3/5 sm:w-auto px-2 py-1"
         />
         <input
           type="submit"
           value="OK"
+          className="cursor-pointer border px-2 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed max-[900px]:block max-[900px]:mt-2.5 max-[900px]:py-1.5 max-[900px]:text-base max-[900px]:w-full max-[900px]:box-border"
           disabled={!enableSubmit}
-          className="cursor-pointer border px-1 rounded sm:ml-2 w-fit disabled:opacity-50 disabled:cursor-not-allowed"
         />
       </form>
     </div>
   );
-}
-
-Login.propTypes = {
-  logIn: PropTypes.func
 };
 
 export default WithLogging(Login);
