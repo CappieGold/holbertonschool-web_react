@@ -16,13 +16,7 @@ const ENDPOINTS = {
   notifications: `${API_BASE_URL}/notifications.json`,
 };
 
-const defaultUser = {
-  email: '',
-  password: '',
-  isLoggedIn: false
-};
-
-function App() {
+export default function App() {
   const [displayDrawer, setDisplayDrawer] = useState(true);
   const [user, setUser] = useState({ ...newContext.user });
   const [notifications, setNotifications] = useState([]);
@@ -89,8 +83,8 @@ function App() {
 
   const logIn = (email, password) => {
     setUser({
-      email: email,
-      password: password,
+      email,
+      password,
       isLoggedIn: true
     });
   };
@@ -99,35 +93,28 @@ function App() {
     setUser({
       email: '',
       password: '',
-      isLoggedIn: false
+      isLoggedIn: false,
     });
   };
 
   const markNotificationAsRead = useCallback((id) => {
-    setNotifications((prevNotifications) => 
-      prevNotifications.filter((notification) => notification.id !== id)
+    setNotifications(prev =>
+      prev.filter(notification => notification.id !== id)
     );
     console.log(`Notification ${id} has been marked as read`);
   }, []);
 
-  const contextValue = {
-    user: user,
-    logOut: logOut
-  };
-
   return (
-    <newContext.Provider value={contextValue}>
+    <newContext.Provider value={{ user, logOut }}>
       <div className="relative px-3 min-h-screen flex flex-col">
-        <div className="absolute top-0 right-0 z-10">
-          <Notifications
-            notifications={notifications}
-            displayDrawer={displayDrawer}
-            handleDisplayDrawer={handleDisplayDrawer}
-            handleHideDrawer={handleHideDrawer}
-            markNotificationAsRead={markNotificationAsRead}
-          />
-        </div>
-        <div className="flex-1">
+        <Notifications
+          notifications={notifications}
+          handleHideDrawer={handleHideDrawer}
+          handleDisplayDrawer={handleDisplayDrawer}
+          displayDrawer={displayDrawer}
+          markNotificationAsRead={markNotificationAsRead}
+        />
+        <>
           <Header />
           {!user.isLoggedIn ? (
             <BodySectionWithMarginBottom title="Log in to continue">
@@ -145,11 +132,9 @@ function App() {
           <BodySection title="News from the School">
             <p>Holberton School news goes here</p>
           </BodySection>
-        </div>
+        </>
         <Footer />
       </div>
     </newContext.Provider>
   );
 }
-
-export default App;
