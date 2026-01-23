@@ -5,41 +5,73 @@ describe('authSlice', () => {
     user: {
       email: '',
       password: '',
-      isLoggedIn: false,
     },
+    isLoggedIn: false,
   };
 
-  test('should return the correct initial state by default', () => {
-    const result = authReducer(undefined, { type: 'unknown' });
-    expect(result).toEqual(initialState);
+  describe('initialState', () => {
+    it('should return the initial state', () => {
+      expect(authReducer(undefined, { type: 'unknown' })).toEqual(initialState);
+    });
   });
 
-  test('should update state correctly when login action is dispatched', () => {
-    const credentials = {
-      email: 'test@example.com',
-      password: 'password123',
-    };
-
-    const result = authReducer(initialState, login(credentials));
-
-    expect(result.user.email).toBe(credentials.email);
-    expect(result.user.password).toBe(credentials.password);
-    expect(result.user.isLoggedIn).toBe(true);
-  });
-
-  test('should reset state correctly when logout action is dispatched', () => {
-    const loggedInState = {
-      user: {
-        email: 'test@example.com',
+  describe('login action', () => {
+    it('should update the state with user email and password from payload', () => {
+      const userPayload = {
+        email: 'test@test.com',
         password: 'password123',
+      };
+
+      const action = login(userPayload);
+      const newState = authReducer(initialState, action);
+
+      expect(newState.user.email).toBe(userPayload.email);
+      expect(newState.user.password).toBe(userPayload.password);
+    });
+
+    it('should set isLoggedIn to true when login action is dispatched', () => {
+      const userPayload = {
+        email: 'test@test.com',
+        password: 'password123',
+      };
+
+      const action = login(userPayload);
+      const newState = authReducer(initialState, action);
+
+      expect(newState.isLoggedIn).toBe(true);
+    });
+  });
+
+  describe('logout action', () => {
+    it('should reset user email and password to empty string', () => {
+      const loggedInState = {
+        user: {
+          email: 'test@test.com',
+          password: 'password123',
+        },
         isLoggedIn: true,
-      },
-    };
+      };
 
-    const result = authReducer(loggedInState, logout());
+      const action = logout();
+      const newState = authReducer(loggedInState, action);
 
-    expect(result.user.email).toBe('');
-    expect(result.user.password).toBe('');
-    expect(result.user.isLoggedIn).toBe(false);
+      expect(newState.user.email).toBe('');
+      expect(newState.user.password).toBe('');
+    });
+
+    it('should set isLoggedIn to false when logout action is dispatched', () => {
+      const loggedInState = {
+        user: {
+          email: 'test@test.com',
+          password: 'password123',
+        },
+        isLoggedIn: true,
+      };
+
+      const action = logout();
+      const newState = authReducer(loggedInState, action);
+
+      expect(newState.isLoggedIn).toBe(false);
+    });
   });
 });
