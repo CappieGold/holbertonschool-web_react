@@ -1,6 +1,8 @@
+import { useDispatch } from "react-redux";
 import { StyleSheet, css } from "aphrodite";
 import WithLogging from "../../components/HOC/WithLogging";
 import useLogin from "../../hooks/useLogin";
+import { login } from "../../features/auth/authSlice";
 
 const styles = StyleSheet.create({
   body: {
@@ -56,7 +58,9 @@ const styles = StyleSheet.create({
   },
 });
 
-const Login = ({ logIn }) => {
+const Login = () => {
+  const dispatch = useDispatch();
+
   const {
     email,
     password,
@@ -64,7 +68,9 @@ const Login = ({ logIn }) => {
     handleChangeEmail,
     handleChangePassword,
     handleLoginSubmit
-  } = useLogin(logIn);
+  } = useLogin((email, password) => {
+    dispatch(login({ email, password }));
+  });
 
   return (
     <div className={css(styles.body)}>
