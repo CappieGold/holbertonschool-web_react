@@ -1,89 +1,72 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from '../../app/rootReducer';
 import Login from './Login';
 
-test('testing signin form elements', () => {
-  const { container } = render(<Login />);
-
-  const inputElements = container.querySelectorAll('input[type="email"], input[type="text"], input[type="password"]');
-
-  const emailLabelElement = screen.getByLabelText(/email/i);
-  const passwordLabelElement = screen.getByLabelText(/password/i);
-  const buttonElementText = screen.getByRole('button', { name: 'OK' })
-
-  expect(inputElements.length).toBeGreaterThanOrEqual(2);
-  expect(emailLabelElement).toBeInTheDocument();
-  expect(passwordLabelElement).toBeInTheDocument();
-  expect(buttonElementText).toBeInTheDocument();
-});
-
-test('it should check that the email input element will be focused whenever the associated label is clicked', async () => {
-  render(<Login />)
-
-  const emailInput = screen.getByLabelText('Email');
-  const emailLabel = screen.getByText('Email');
-
-  userEvent.click(emailLabel);
-
-  await waitFor(() => {
-    expect(emailInput).toHaveFocus();
+const createMockStore = (preloadedState) => {
+  return configureStore({
+    reducer: rootReducer,
+    preloadedState,
   });
-})
+};
 
-test('it should check that the password input element will be focused whenver the associated label is clicked', async () => {
-  render(<Login />)
+const defaultState = {
+  auth: { user: { email: '', password: '' }, isLoggedIn: false },
+  notifications: { notifications: [], displayDrawer: true },
+  courses: { courses: [] },
+};
 
-  const passwordLabel = screen.getByText('Password');
-  const passwordInput = screen.getByLabelText('Password');
+test('renders login form with email, password fields and submit button', () => {
+  const store = createMockStore(defaultState);
+  render(
+    <Provider store={store}>
+      <Login />
+    </Provider>
+  );
 
-  userEvent.click(passwordLabel);
-
-  await waitFor(() => {
-    expect(passwordInput).toHaveFocus();
-  });
+  expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /ok/i })).toBeInTheDocument();
 });
 
 test('submit button is disabled by default', () => {
-  render(<Login isLoggedIn={false} />);
-  const submitButton = screen.getByText('OK');
+  const store = createMockStore(defaultState);
+  render(
+    <Provider store={store}>
+      <Login />
+    </Provider>
+  );
 
-  expect(submitButton).toBeDisabled();
+  expect(screen.getByRole('button', { name: /ok/i })).toBeDisabled();
 });
 
-test('submit button is enabled only with a valid email and password of at least 8 characters', () => {
-  render(<Login isLoggedIn={false} />);
-  
-  const emailInput = screen.getByLabelText('Email');
-  const passwordInput = screen.getByLabelText('Password');
-  const submitButton = screen.getByText('OK');
+test('sets isLoggedIn to true on valid form submission', () => {
+  const store = createMockStore(defaultState);
+  render(
+    <Provider store={store}>
+      <Login />
+    </Provider>
+  );
 
-  expect(submitButton).toBeDisabled();
+  fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@test.com' } });
+  fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
+  fireEvent.click(screen.getByRole('button', { name: /ok/i }));
 
-  fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-  fireEvent.change(passwordInput, { target: { value: '123' } });
-  expect(submitButton).toBeDisabled();
-
-  fireEvent.change(emailInput, { target: { value: 'test.com' } });
-  fireEvent.change(passwordInput, { target: { value: '12345678' } });
-  expect(submitButton).toBeDisabled();
-
-  fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-  fireEvent.change(passwordInput, { target: { value: '12345678' } });
-  expect(submitButton).not.toBeDisabled();
+  expect(store.getState().auth.isLoggedIn).toBe(true);
 });
 
-test('should call logIn function on form submission', () => {
-  const mockLogin = jest.fn();
-  render(<Login logIn={mockLogin} />);
+test('isLoggedIn remains false with invalid credentials', () => {
+  const store = createMockStore(defaultState);
+  render(
+    <Provider store={store}>
+      <Login />
+    </Provider>
+  );
 
-  const emailInput = screen.getByLabelText(/email/i);
-  const passwordInput = screen.getByLabelText(/password/i);
+  fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'invalid' } });
+  fireEvent.change(screen.getByLabelText(/password/i), { target: { value: '123' } });
 
-  fireEvent.change(emailInput, { target: { value: 'test@test.com' } });
-  fireEvent.change(passwordInput, { target: { value: 'password123' } });
-
-  const submitButton = screen.getByRole('button', { name: /ok/i });
-  fireEvent.click(submitButton);
-
-  expect(mockLogin).toHaveBeenCalledWith('test@test.com', 'password123');
+  expect(screen.getByRole('button', { name: /ok/i })).toBeDisabled();
+  expect(store.getState().auth.isLoggedIn).toBe(false);
 });

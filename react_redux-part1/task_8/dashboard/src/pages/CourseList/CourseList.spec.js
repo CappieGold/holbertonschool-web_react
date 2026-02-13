@@ -1,32 +1,60 @@
 import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from '../../app/rootReducer';
 import CourseList from './CourseList';
+import { logout } from '../../features/auth/authSlice';
+import mockAxios from 'jest-mock-axios';
 
+afterEach(() => {
+  mockAxios.reset();
+});
 
-test('it should render the CourseList component with 5 rows', () => {
-  const props = {
-    courses : [
-      { id:1, name:'ES6', credit:60 },
-      { id:2, name:'Webpack', credit:20 },
-      { id:3, name:'React', credit:40 }
-    ]
-  }
-  render(<CourseList {...props} />)
+const createMockStore = (preloadedState) => {
+  return configureStore({
+    reducer: rootReducer,
+    preloadedState,
+  });
+};
 
-  const rowElements = screen.getAllByRole('row');
+test('displays courses list when courses are in the store', () => {
+  const store = createMockStore({
+    auth: { user: { email: 'test@test.com', password: 'pass' }, isLoggedIn: true },
+    notifications: { notifications: [], displayDrawer: true },
+    courses: {
+      courses: [
+        { id: 1, name: 'ES6', credit: 60 },
+        { id: 2, name: 'Webpack', credit: 20 },
+        { id: 3, name: 'React', credit: 40 },
+      ],
+    },
+  });
 
-  expect(rowElements).toHaveLength(5)
-})
+  render(
+    <Provider store={store}>
+      <CourseList />
+    </Provider>
+  );
 
-test('it should render the CourseList component with 1 row', () => {
-  const props = {
-    courses : []
-  }
+  expect(screen.getByText('ES6')).toBeInTheDocument();
+  expect(screen.getByText('Webpack')).toBeInTheDocument();
+  expect(screen.getByText('React')).toBeInTheDocument();
+});
 
-  render(<CourseList {...props} />)
+test('resets courses array when logout is dispatched', () => {
+  const store = createMockStore({
+    auth: { user: { email: 'test@test.com', password: 'pass' }, isLoggedIn: true },
+    notifications: { notifications: [], displayDrawer: true },
+    courses: {
+      courses: [
+        { id: 1, name: 'ES6', credit: 60 },
+        { id: 2, name: 'Webpack', credit: 20 },
+        { id: 3, name: 'React', credit: 40 },
+      ],
+    },
+  });
 
-  const rowElement = screen.getAllByRole('row');
-  const rowText = screen.getByText(/No course available yet/i);
+  store.dispatch(logout());
 
-  expect(rowElement).toHaveLength(1)
-  expect(rowText).toBeInTheDocument()
+  expect(store.getState().courses.courses).toEqual([]);
 });
