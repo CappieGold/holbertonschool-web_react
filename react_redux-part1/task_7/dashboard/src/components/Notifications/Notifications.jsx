@@ -1,7 +1,9 @@
 import { memo } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { StyleSheet, css } from "aphrodite";
 import closeIcon from "../../assets/close-icon.png";
 import NotificationItem from "../NotificationItem/NotificationItem";
+import { markNotificationAsRead, showDrawer, hideDrawer } from "../../features/notifications/notificationsSlice";
 
 const opacityKeyframes = {
   from: {
@@ -85,13 +87,22 @@ const styles = StyleSheet.create({
   },
 });
 
-const Notifications = memo(function Notifications({
-  displayDrawer,
-  handleDisplayDrawer,
-  handleHideDrawer,
-  notifications,
-  markNotificationAsRead,
-}) {
+const Notifications = memo(function Notifications() {
+  const { notifications, displayDrawer } = useSelector((state) => state.notifications);
+  const dispatch = useDispatch();
+
+  const handleDisplayDrawer = () => {
+    dispatch(showDrawer());
+  };
+
+  const handleHideDrawer = () => {
+    dispatch(hideDrawer());
+  };
+
+  const handleMarkAsRead = (id) => {
+    dispatch(markNotificationAsRead(id));
+  };
+
   return (
     <>
       <div
@@ -120,7 +131,7 @@ const Notifications = memo(function Notifications({
                     type={notification.type}
                     value={notification.value}
                     html={notification.html}
-                    markAsRead={markNotificationAsRead}
+                    markAsRead={handleMarkAsRead}
                   />
                 ))}
               </ul>
