@@ -11,6 +11,7 @@ afterEach(() => {
 describe('notificationsSlice', () => {
   const initialState = {
     notifications: [],
+    loading: false,
   };
 
   describe('initialState', () => {
@@ -20,7 +21,13 @@ describe('notificationsSlice', () => {
   });
 
   describe('fetchNotifications', () => {
-    it('should fetch notifications data correctly', () => {
+    it('should set loading to true when fetchNotifications is pending', () => {
+      const action = { type: fetchNotifications.pending.type };
+      const newState = notificationsReducer(initialState, action);
+      expect(newState.loading).toBe(true);
+    });
+
+    it('should fetch notifications data correctly and set loading to false', () => {
       const notifications = [
         { id: 1, type: 'default', value: 'New course available' },
         { id: 2, type: 'urgent', value: 'New resume available' },
@@ -32,10 +39,19 @@ describe('notificationsSlice', () => {
         payload: notifications,
       };
 
-      const newState = notificationsReducer(initialState, action);
+      const loadingState = { ...initialState, loading: true };
+      const newState = notificationsReducer(loadingState, action);
 
       expect(newState.notifications).toEqual(notifications);
       expect(newState.notifications).toHaveLength(3);
+      expect(newState.loading).toBe(false);
+    });
+
+    it('should set loading to false when fetchNotifications is rejected', () => {
+      const action = { type: fetchNotifications.rejected.type };
+      const loadingState = { ...initialState, loading: true };
+      const newState = notificationsReducer(loadingState, action);
+      expect(newState.loading).toBe(false);
     });
   });
 
@@ -49,6 +65,7 @@ describe('notificationsSlice', () => {
           { id: 2, type: 'urgent', value: 'New resume available' },
           { id: 3, type: 'urgent', html: { __html: '<strong>Urgent requirement</strong> - complete by EOD' } },
         ],
+        loading: false,
       };
 
       const newState = notificationsReducer(stateWithNotifications, markNotificationAsRead(2));

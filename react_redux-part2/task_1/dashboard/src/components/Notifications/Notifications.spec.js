@@ -24,6 +24,7 @@ test('displays notification items when notifications are in the store', () => {
         { id: 1, type: 'default', value: 'New course available' },
         { id: 2, type: 'urgent', value: 'New resume available' },
       ],
+      loading: false,
     },
     courses: { courses: [] },
   });
@@ -47,6 +48,7 @@ test('drawer is hidden by default via Aphrodite styles', () => {
       notifications: [
         { id: 1, type: 'default', value: 'New course available' },
       ],
+      loading: false,
     },
     courses: { courses: [] },
   });
@@ -68,6 +70,7 @@ test('adds visible class when "Your notifications" is clicked', () => {
       notifications: [
         { id: 1, type: 'default', value: 'New course available' },
       ],
+      loading: false,
     },
     courses: { courses: [] },
   });
@@ -91,6 +94,7 @@ test('removes visible class when close button is clicked', () => {
       notifications: [
         { id: 1, type: 'default', value: 'New course available' },
       ],
+      loading: false,
     },
     courses: { courses: [] },
   });
@@ -118,6 +122,7 @@ test('removes notification from list when marked as read', () => {
         { id: 1, type: 'default', value: 'New course available' },
         { id: 2, type: 'urgent', value: 'New resume available' },
       ],
+      loading: false,
     },
     courses: { courses: [] },
   });
@@ -136,4 +141,44 @@ test('removes notification from list when marked as read', () => {
   expect(store.getState().notifications.notifications).toHaveLength(1);
 
   consoleSpy.mockRestore();
+});
+
+test('displays Loading... when loading is true', () => {
+  const store = createMockStore({
+    auth: { user: { email: '', password: '' }, isLoggedIn: false },
+    notifications: {
+      notifications: [],
+      loading: true,
+    },
+    courses: { courses: [] },
+  });
+
+  render(
+    <Provider store={store}>
+      <Notifications />
+    </Provider>
+  );
+
+  fireEvent.click(screen.getByText(/your notifications/i));
+
+  expect(screen.getByText('Loading...')).toBeInTheDocument();
+});
+
+test('does not display Loading... when loading is false', () => {
+  const store = createMockStore({
+    auth: { user: { email: '', password: '' }, isLoggedIn: false },
+    notifications: {
+      notifications: [],
+      loading: false,
+    },
+    courses: { courses: [] },
+  });
+
+  render(
+    <Provider store={store}>
+      <Notifications />
+    </Provider>
+  );
+
+  expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
 });
