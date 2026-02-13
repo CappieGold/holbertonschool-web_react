@@ -58,7 +58,7 @@ test('drawer is hidden by default via Aphrodite styles', () => {
   );
 
   const drawer = container.querySelector('[class*="notificationItems"]');
-  expect(drawer).not.toHaveClass(expect.stringContaining('visible'));
+  expect(drawer.className).not.toContain('visible');
 });
 
 test('adds visible class when "Your notifications" is clicked', () => {
