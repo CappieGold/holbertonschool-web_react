@@ -59,11 +59,12 @@ function CourseList() {
               {
                 courses.map(course => (
                   <CourseListRow 
-                    key={course.id} 
+                    key={course.id}
+                    id={course.id}
                     textFirstCell={course.name} 
                     textSecondCell={course.credit}
                     isChecked={course.isSelected}
-                    onChangeRow={() => onChangeRow(course.id, !course.isSelected)}
+                    changeRow={onChangeRow}
                   />
                 ))
               }

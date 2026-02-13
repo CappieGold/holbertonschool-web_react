@@ -36,17 +36,17 @@ test('renders regular row with two td cells and a checkbox', () => {
   expect(screen.getByRole('checkbox')).toBeInTheDocument();
 });
 
-test('checkbox calls onChangeRow when clicked', () => {
-  const mockOnChangeRow = jest.fn();
+test('checkbox calls changeRow with id and checked state when clicked', () => {
+  const mockChangeRow = jest.fn();
 
   render(
     <table><tbody>
-      <CourseListRow isHeader={false} textFirstCell="Data1" textSecondCell="Data2" onChangeRow={mockOnChangeRow} />
+      <CourseListRow isHeader={false} textFirstCell="Data1" textSecondCell="Data2" id={1} changeRow={mockChangeRow} />
     </tbody></table>
   );
 
   fireEvent.click(screen.getByRole('checkbox'));
-  expect(mockOnChangeRow).toHaveBeenCalledTimes(1);
+  expect(mockChangeRow).toHaveBeenCalledWith(1, true);
 });
 
 test('header row does not render a checkbox', () => {
