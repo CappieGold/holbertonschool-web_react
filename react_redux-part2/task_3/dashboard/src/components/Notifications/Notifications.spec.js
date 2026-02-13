@@ -16,16 +16,16 @@ const createMockStore = (preloadedState) => {
   });
 };
 
+const defaultNotifications = [
+  { id: '1', type: 'default', isRead: false, value: 'Default notification' },
+  { id: '2', type: 'urgent', isRead: false, value: 'Urgent notification' },
+  { id: '3', type: 'default', isRead: false, value: 'Another default' },
+];
+
 test('displays notification items when notifications are in the store', () => {
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: {
-      notifications: [
-        { id: 1, type: 'default', value: 'New course available' },
-        { id: 2, type: 'urgent', value: 'New resume available' },
-      ],
-      loading: false,
-    },
+    notifications: { notifications: defaultNotifications, loading: false },
     courses: { courses: [] },
   });
 
@@ -37,19 +37,15 @@ test('displays notification items when notifications are in the store', () => {
 
   fireEvent.click(screen.getByText(/your notifications/i));
 
-  expect(screen.getByText('New course available')).toBeInTheDocument();
-  expect(screen.getByText('New resume available')).toBeInTheDocument();
+  expect(screen.getByText('Default notification')).toBeInTheDocument();
+  expect(screen.getByText('Urgent notification')).toBeInTheDocument();
+  expect(screen.getByText('Another default')).toBeInTheDocument();
 });
 
 test('drawer is hidden by default via Aphrodite styles', () => {
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: {
-      notifications: [
-        { id: 1, type: 'default', value: 'New course available' },
-      ],
-      loading: false,
-    },
+    notifications: { notifications: defaultNotifications, loading: false },
     courses: { courses: [] },
   });
 
@@ -66,12 +62,7 @@ test('drawer is hidden by default via Aphrodite styles', () => {
 test('adds visible class when "Your notifications" is clicked', () => {
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: {
-      notifications: [
-        { id: 1, type: 'default', value: 'New course available' },
-      ],
-      loading: false,
-    },
+    notifications: { notifications: defaultNotifications, loading: false },
     courses: { courses: [] },
   });
 
@@ -90,12 +81,7 @@ test('adds visible class when "Your notifications" is clicked', () => {
 test('removes visible class when close button is clicked', () => {
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: {
-      notifications: [
-        { id: 1, type: 'default', value: 'New course available' },
-      ],
-      loading: false,
-    },
+    notifications: { notifications: defaultNotifications, loading: false },
     courses: { courses: [] },
   });
 
@@ -117,13 +103,7 @@ test('removes notification from list when marked as read', () => {
 
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: {
-      notifications: [
-        { id: 1, type: 'default', value: 'New course available' },
-        { id: 2, type: 'urgent', value: 'New resume available' },
-      ],
-      loading: false,
-    },
+    notifications: { notifications: defaultNotifications, loading: false },
     courses: { courses: [] },
   });
 
@@ -138,7 +118,7 @@ test('removes notification from list when marked as read', () => {
   const items = screen.getAllByRole('listitem');
   fireEvent.click(items[0]);
 
-  expect(store.getState().notifications.notifications).toHaveLength(1);
+  expect(store.getState().notifications.notifications).toHaveLength(2);
 
   consoleSpy.mockRestore();
 });
@@ -146,10 +126,7 @@ test('removes notification from list when marked as read', () => {
 test('displays Loading... when loading is true', () => {
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: {
-      notifications: [],
-      loading: true,
-    },
+    notifications: { notifications: [], loading: true },
     courses: { courses: [] },
   });
 
@@ -167,10 +144,7 @@ test('displays Loading... when loading is true', () => {
 test('does not display Loading... when loading is false', () => {
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: {
-      notifications: [],
-      loading: false,
-    },
+    notifications: { notifications: [], loading: false },
     courses: { courses: [] },
   });
 
@@ -181,4 +155,69 @@ test('does not display Loading... when loading is false', () => {
   );
 
   expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+});
+
+test('clicking ‼️ filters to show only urgent notifications', () => {
+  const store = createMockStore({
+    auth: { user: { email: '', password: '' }, isLoggedIn: false },
+    notifications: { notifications: defaultNotifications, loading: false },
+    courses: { courses: [] },
+  });
+
+  render(
+    <Provider store={store}>
+      <Notifications />
+    </Provider>
+  );
+
+  fireEvent.click(screen.getByText(/your notifications/i));
+  fireEvent.click(screen.getByText('‼️'));
+
+  expect(screen.getByText('Urgent notification')).toBeInTheDocument();
+  expect(screen.queryByText('Default notification')).not.toBeInTheDocument();
+  expect(screen.queryByText('Another default')).not.toBeInTheDocument();
+});
+
+test('clicking ?? filters to show only default notifications', () => {
+  const store = createMockStore({
+    auth: { user: { email: '', password: '' }, isLoggedIn: false },
+    notifications: { notifications: defaultNotifications, loading: false },
+    courses: { courses: [] },
+  });
+
+  render(
+    <Provider store={store}>
+      <Notifications />
+    </Provider>
+  );
+
+  fireEvent.click(screen.getByText(/your notifications/i));
+  fireEvent.click(screen.getByText('??'));
+
+  expect(screen.getByText('Default notification')).toBeInTheDocument();
+  expect(screen.getByText('Another default')).toBeInTheDocument();
+  expect(screen.queryByText('Urgent notification')).not.toBeInTheDocument();
+});
+
+test('clicking the same filter button again resets to all', () => {
+  const store = createMockStore({
+    auth: { user: { email: '', password: '' }, isLoggedIn: false },
+    notifications: { notifications: defaultNotifications, loading: false },
+    courses: { courses: [] },
+  });
+
+  render(
+    <Provider store={store}>
+      <Notifications />
+    </Provider>
+  );
+
+  fireEvent.click(screen.getByText(/your notifications/i));
+
+  fireEvent.click(screen.getByText('‼️'));
+  expect(screen.queryByText('Default notification')).not.toBeInTheDocument();
+
+  fireEvent.click(screen.getByText('‼️'));
+  expect(screen.getByText('Default notification')).toBeInTheDocument();
+  expect(screen.getByText('Urgent notification')).toBeInTheDocument();
 });

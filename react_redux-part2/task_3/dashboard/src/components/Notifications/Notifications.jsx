@@ -1,9 +1,10 @@
-import { useRef, memo } from "react";
+import { useRef, memo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { StyleSheet, css } from "aphrodite";
 import closeIcon from "../../assets/close-icon.png";
 import NotificationItem from "../NotificationItem/NotificationItem";
 import { markNotificationAsRead } from "../../features/notifications/notificationsSlice";
+import { getFilteredNotifications } from "../../features/selectors/notificationsSelector";
 
 const opacityKeyframes = {
   from: {
@@ -94,9 +95,14 @@ const styles = StyleSheet.create({
 });
 
 const Notifications = memo(function Notifications() {
-  const { notifications, loading } = useSelector((state) => state.notifications);
+  const { loading } = useSelector((state) => state.notifications);
   const dispatch = useDispatch();
   const drawerRef = useRef(null);
+  const [currentFilter, setCurrentFilter] = useState('all');
+
+  const filteredNotifications = useSelector((state) =>
+    getFilteredNotifications(state, currentFilter)
+  );
 
   const handleToggleDrawer = () => {
     if (drawerRef.current) {
@@ -107,6 +113,14 @@ const Notifications = memo(function Notifications() {
 
   const handleMarkAsRead = (id) => {
     dispatch(markNotificationAsRead(id));
+  };
+
+  const handleSetFilterUrgent = () => {
+    setCurrentFilter((prev) => (prev === 'urgent' ? 'all' : 'urgent'));
+  };
+
+  const handleSetFilterDefault = () => {
+    setCurrentFilter((prev) => (prev === 'default' ? 'all' : 'default'));
   };
 
   return (
@@ -120,9 +134,11 @@ const Notifications = memo(function Notifications() {
       <div ref={drawerRef} className={css(styles.notificationItems)}>
         {loading ? (
           <p className={css(styles.p)}>Loading...</p>
-        ) : notifications.length > 0 ? (
+        ) : (
           <>
             <p className={css(styles.p)}>Here is the list of notifications</p>
+            <button onClick={handleSetFilterUrgent}>‼️</button>
+            <button onClick={handleSetFilterDefault}>??</button>
             <button
               onClick={handleToggleDrawer}
               aria-label="Close"
@@ -131,20 +147,17 @@ const Notifications = memo(function Notifications() {
               <img src={closeIcon} alt="close icon" />
             </button>
             <ul className={css(styles.ul)}>
-              {notifications.map((notification) => (
+              {filteredNotifications.map((notification) => (
                 <NotificationItem
                   id={notification.id}
                   key={notification.id}
                   type={notification.type}
                   value={notification.value}
-                  html={notification.html}
                   markAsRead={handleMarkAsRead}
                 />
               ))}
             </ul>
           </>
-        ) : (
-          <p className={css(styles.p)}>No new notifications for now</p>
         )}
       </div>
     </>

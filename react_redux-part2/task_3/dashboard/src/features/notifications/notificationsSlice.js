@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { getLatestNotification } from '../../utils/utils';
 
 const API_BASE_URL = 'http://localhost:5173';
 const ENDPOINTS = {
@@ -11,19 +10,18 @@ export const fetchNotifications = createAsyncThunk(
   'notifications/fetchNotifications',
   async () => {
     const response = await axios.get(ENDPOINTS.notifications);
-    const notifications = response.data.notifications;
+    const data = response.data;
 
-    const latestNotif = {
-      id: 3,
-      type: 'urgent',
-      html: { __html: getLatestNotification() },
-    };
+    const unreadNotifications = data
+      .filter((item) => item.context.isRead === false)
+      .map((item) => ({
+        id: item.id,
+        type: item.context.type,
+        isRead: item.context.isRead,
+        value: item.context.value,
+      }));
 
-    const updatedNotifications = notifications.map((notification) =>
-      notification.id === 3 ? latestNotif : notification
-    );
-
-    return updatedNotifications;
+    return unreadNotifications;
   }
 );
 

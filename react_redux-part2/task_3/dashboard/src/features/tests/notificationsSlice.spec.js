@@ -27,11 +27,10 @@ describe('notificationsSlice', () => {
       expect(newState.loading).toBe(true);
     });
 
-    it('should fetch notifications data correctly and set loading to false', () => {
+    it('should store notifications and set loading to false when fulfilled', () => {
       const notifications = [
-        { id: 1, type: 'default', value: 'New course available' },
-        { id: 2, type: 'urgent', value: 'New resume available' },
-        { id: 3, type: 'urgent', html: { __html: '<strong>Urgent requirement</strong> - complete by EOD' } },
+        { id: '1', type: 'urgent', isRead: false, value: 'Test urgent' },
+        { id: '2', type: 'default', isRead: false, value: 'Test default' },
       ];
 
       const action = {
@@ -43,7 +42,7 @@ describe('notificationsSlice', () => {
       const newState = notificationsReducer(loadingState, action);
 
       expect(newState.notifications).toEqual(notifications);
-      expect(newState.notifications).toHaveLength(3);
+      expect(newState.notifications).toHaveLength(2);
       expect(newState.loading).toBe(false);
     });
 
@@ -61,17 +60,17 @@ describe('notificationsSlice', () => {
 
       const stateWithNotifications = {
         notifications: [
-          { id: 1, type: 'default', value: 'New course available' },
-          { id: 2, type: 'urgent', value: 'New resume available' },
-          { id: 3, type: 'urgent', html: { __html: '<strong>Urgent requirement</strong> - complete by EOD' } },
+          { id: '1', type: 'urgent', isRead: false, value: 'Test urgent' },
+          { id: '2', type: 'default', isRead: false, value: 'Test default' },
+          { id: '3', type: 'urgent', isRead: false, value: 'Another urgent' },
         ],
         loading: false,
       };
 
-      const newState = notificationsReducer(stateWithNotifications, markNotificationAsRead(2));
+      const newState = notificationsReducer(stateWithNotifications, markNotificationAsRead('2'));
 
       expect(newState.notifications).toHaveLength(2);
-      expect(newState.notifications.find((n) => n.id === 2)).toBeUndefined();
+      expect(newState.notifications.find((n) => n.id === '2')).toBeUndefined();
       expect(consoleSpy).toHaveBeenCalledWith('Notification 2 has been marked as read');
 
       consoleSpy.mockRestore();

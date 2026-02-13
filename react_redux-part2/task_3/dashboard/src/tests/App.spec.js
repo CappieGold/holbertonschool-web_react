@@ -17,20 +17,17 @@ const createMockStore = (preloadedState) => {
 };
 
 const mockNotificationsResponse = {
-  data: {
-    notifications: [
-      { id: 1, type: 'default', value: 'New course available' },
-      { id: 2, type: 'urgent', value: 'New resume available' },
-      { id: 3, type: 'urgent', html: { __html: '' } }
-    ]
-  }
+  data: [
+    { id: '1', author: {}, context: { guid: '1', isRead: false, type: 'default', value: 'New course available' } },
+    { id: '2', author: {}, context: { guid: '2', isRead: false, type: 'urgent', value: 'New resume available' } },
+    { id: '3', author: {}, context: { guid: '3', isRead: true, type: 'urgent', value: 'Already read' } },
+  ]
 };
-
 
 test('renders Login when isLoggedIn is false', () => {
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: { notifications: [], displayDrawer: true },
+    notifications: { notifications: [], loading: false },
     courses: { courses: [] },
   });
 
@@ -49,7 +46,7 @@ test('renders Login when isLoggedIn is false', () => {
 test('renders CourseList when isLoggedIn is true', async () => {
   const store = createMockStore({
     auth: { user: { email: 'test@test.com', password: 'pass' }, isLoggedIn: true },
-    notifications: { notifications: [], displayDrawer: true },
+    notifications: { notifications: [], loading: false },
     courses: { courses: [{ id: 1, name: 'ES6', credit: 60 }] },
   });
 
@@ -67,7 +64,7 @@ test('renders CourseList when isLoggedIn is true', async () => {
 test('fetches notifications on mount and displays them', async () => {
   const store = createMockStore({
     auth: { user: { email: '', password: '' }, isLoggedIn: false },
-    notifications: { notifications: [], displayDrawer: true },
+    notifications: { notifications: [], loading: false },
     courses: { courses: [] },
   });
 
