@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from '../app/rootReducer';
@@ -26,15 +26,6 @@ const mockNotificationsResponse = {
   }
 };
 
-const mockCoursesResponse = {
-  data: {
-    courses: [
-      { id: 1, name: 'ES6', credit: 60 },
-      { id: 2, name: 'Webpack', credit: 20 },
-      { id: 3, name: 'React', credit: 40 }
-    ]
-  }
-};
 
 test('renders Login when isLoggedIn is false', () => {
   const store = createMockStore({

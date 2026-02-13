@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import NotificationItem from './NotificationItem';
 
 test('renders notification with default type in blue', () => {

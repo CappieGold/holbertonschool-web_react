@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Footer() {
-  const { user, isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
   return (
     <div className={css(styles.footer)}>
